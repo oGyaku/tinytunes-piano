@@ -7,6 +7,7 @@ import PianoKeyboard from '@/components/piano/PianoKeyboard';
 import SongCard from '@/components/piano/SongCard';
 import ScoreDisplay from '@/components/piano/ScoreDisplay';
 import CompletionModal from '@/components/piano/CompletionModal';
+import InstrumentSelector from '@/components/piano/InstrumentSelector';
 import BackgroundBubbles from '@/components/piano/BackgroundBubbles';
 import { SONGS, playNote } from '@/lib/audioEngine';
 
@@ -18,11 +19,11 @@ export default function SongMode() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const [instrument, setInstrument] = useState('piano');
   const autoPlayRef = useRef(null);
 
   const currentNote = selectedSong ? selectedSong.notes[currentNoteIndex] : null;
 
-  // Cleanup auto-play on unmount
   useEffect(() => {
     return () => {
       if (autoPlayRef.current) clearTimeout(autoPlayRef.current);
@@ -44,7 +45,6 @@ export default function SongMode() {
     if (!isPlaying || !selectedSong || isAutoPlaying) return;
 
     if (note === currentNote) {
-      // Correct note
       const newCombo = combo + 1;
       const points = 10 + (newCombo > 1 ? newCombo * 2 : 0);
       setScore(prev => prev + points);
@@ -52,7 +52,6 @@ export default function SongMode() {
 
       const nextIndex = currentNoteIndex + 1;
       if (nextIndex >= selectedSong.notes.length) {
-        // Song complete
         setIsPlaying(false);
         const finalScore = Math.min(100, Math.round(((score + points) / (selectedSong.notes.length * 14)) * 100));
         setScore(finalScore);
@@ -61,7 +60,6 @@ export default function SongMode() {
         setCurrentNoteIndex(nextIndex);
       }
     } else {
-      // Wrong note
       setCombo(0);
     }
   }, [isPlaying, selectedSong, currentNote, currentNoteIndex, combo, score, isAutoPlaying]);
@@ -80,7 +78,7 @@ export default function SongMode() {
       }
       const note = selectedSong.notes[i];
       setCurrentNoteIndex(i);
-      playNote(note);
+      playNote(note, instrument);
       i++;
       autoPlayRef.current = setTimeout(playNext, selectedSong.tempo);
     };
@@ -88,6 +86,7 @@ export default function SongMode() {
   };
 
   const handleReplay = () => {
+    if (autoPlayRef.current) clearTimeout(autoPlayRef.current);
     setCurrentNoteIndex(0);
     setScore(0);
     setCombo(0);
@@ -95,6 +94,9 @@ export default function SongMode() {
     setShowComplete(false);
     setIsAutoPlaying(false);
   };
+
+  // Derive the letter for display (e.g. 'C4' → 'C')
+  const currentNoteLetter = currentNote ? currentNote.replace(/\d/, '') : null;
 
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col">
@@ -117,10 +119,10 @@ export default function SongMode() {
         <div className="w-10" />
       </div>
 
-      <div className="relative z-10 flex-1 flex flex-col gap-4 md:gap-6 pb-6">
+      <div className="relative z-10 flex-1 flex flex-col gap-3 pb-4">
         {/* Song Selection */}
         <div className="px-4">
-          <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2">
             {SONGS.map(song => (
               <SongCard
                 key={song.id}
@@ -132,8 +134,13 @@ export default function SongMode() {
           </div>
         </div>
 
+        {/* Instrument selector */}
+        <div className="px-4">
+          <InstrumentSelector instrument={instrument} onChange={setInstrument} />
+        </div>
+
         {/* Play area */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 md:gap-6">
+        <div className="flex-1 flex flex-col items-center justify-center gap-3">
           {!selectedSong ? (
             <motion.div
               initial={{ opacity: 0 }}
@@ -154,14 +161,13 @@ export default function SongMode() {
           ) : (
             <>
               {/* Score and controls */}
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-2">
                 <ScoreDisplay
                   score={score}
                   combo={combo}
                   totalNotes={selectedSong.notes.length}
                   currentIndex={currentNoteIndex}
                 />
-
                 <div className="flex gap-2">
                   <Button
                     onClick={handleAutoPlay}
@@ -191,16 +197,17 @@ export default function SongMode() {
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.5, opacity: 0 }}
-                    className="font-fredoka text-3xl md:text-4xl font-bold text-primary"
+                    className="font-fredoka text-2xl md:text-3xl font-bold text-primary"
                   >
-                    按下 <span className="text-4xl md:text-5xl">{currentNote}</span>
+                    按下 <span className="text-3xl md:text-4xl">{currentNoteLetter}</span>
+                    <span className="text-base text-muted-foreground ml-1">({currentNote})</span>
                   </motion.div>
                 )}
               </AnimatePresence>
             </>
           )}
 
-          {/* Piano */}
+          {/* Piano — 3 octaves */}
           <motion.div
             initial={{ y: 60, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -210,12 +217,12 @@ export default function SongMode() {
             <PianoKeyboard
               highlightedNote={isPlaying || isAutoPlaying ? currentNote : null}
               onPlay={handleNotePlay}
+              instrument={instrument}
             />
           </motion.div>
         </div>
       </div>
 
-      {/* Completion Modal */}
       <CompletionModal
         isOpen={showComplete}
         score={score}
