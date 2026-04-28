@@ -1,31 +1,37 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Piano, Music, Headphones } from 'lucide-react';
 import BackgroundBubbles from '@/components/piano/BackgroundBubbles';
 
 const modes = [
   {
     to: '/free-play',
-    icon: Piano,
     emoji: '🎹',
     title: '自由彈奏',
     desc: '用彩色琴鍵創作音樂',
-    gradient: 'from-[#FF4B4B] to-[#FF9F1C]',
+    gradient: 'from-[#F3A8A8] to-[#FCC190]',
   },
   {
     to: '/song-mode',
-    icon: Music,
     emoji: '🎵',
     title: '歌曲跟彈',
     desc: '跟隨提示學習經典歌曲',
-    gradient: 'from-[#4D96FF] to-[#9B59B6]',
+    gradient: 'from-[#9FC2DD] to-[#E8C1F4]',
   },
 ];
 
 export default function Home() {
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4"
+      style={{ background: 'linear-gradient(135deg, #FFF0F5 0%, #FFF9E6 50%, #F0FFFE 100%)' }}
+    >
       <BackgroundBubbles />
+      <div className="absolute top-4 left-4 z-20">
+        <Link to="/">
+          <motion.button whileTap={{ scale: 0.93 }} className="bg-white/70 backdrop-blur-sm rounded-full px-3 py-1.5 font-fredoka text-sm shadow-md text-foreground">
+            ← 遊樂園
+          </motion.button>
+        </Link>
+      </div>
 
       <div className="relative z-10 flex flex-col items-center w-full max-w-lg">
         {/* Logo / Title */}

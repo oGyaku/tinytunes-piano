@@ -32,15 +32,51 @@ function getNoteFreq(note) {
   return base * Math.pow(2, octave - 4);
 }
 
-// Key colors matching rainbow pattern (by letter)
+// Pastel key colors per letter, with 3 octave depth levels
+// oct3 = deep/saturated, oct4 = mid, oct5 = light/pastel
 export const KEY_COLORS = {
-  C: { bg: '#FF4B4B', glow: '#FF8888', label: 'Do' },
-  D: { bg: '#FF9F1C', glow: '#FFBE5C', label: 'Re' },
-  E: { bg: '#FFD93D', glow: '#FFE88A', label: 'Mi' },
-  F: { bg: '#6BCB77', glow: '#9EDEA5', label: 'Fa' },
-  G: { bg: '#4D96FF', glow: '#85B8FF', label: 'Sol' },
-  A: { bg: '#9B59B6', glow: '#C39BD3', label: 'La' },
-  B: { bg: '#FF6B9D', glow: '#FF9DC0', label: 'Si' },
+  C: {
+    oct3: { bg: '#E07070', glow: '#F09090' },
+    oct4: { bg: '#F3A8A8', glow: '#FAC8C8' },
+    oct5: { bg: '#FADADD', glow: '#FDE8EA' },
+    label: 'Do',
+  },
+  D: {
+    oct3: { bg: '#D4882A', glow: '#E8A850' },
+    oct4: { bg: '#FCC190', glow: '#FDD5B0' },
+    oct5: { bg: '#FDDDB4', glow: '#FEEAD0' },
+    label: 'Re',
+  },
+  E: {
+    oct3: { bg: '#C8A800', glow: '#DFC020' },
+    oct4: { bg: '#F9DC7A', glow: '#FBE9A0' },
+    oct5: { bg: '#FEF0B0', glow: '#FEF6D0' },
+    label: 'Mi',
+  },
+  F: {
+    oct3: { bg: '#3A9A50', glow: '#5AB870' },
+    oct4: { bg: '#A0D9A8', glow: '#C0EACA' },
+    oct5: { bg: '#C8EDD0', glow: '#DFF4E5' },
+    label: 'Fa',
+  },
+  G: {
+    oct3: { bg: '#2E78CC', glow: '#5098E0' },
+    oct4: { bg: '#9FC2DD', glow: '#BCE0F8' },
+    oct5: { bg: '#C8DFF0', glow: '#DDEEF8' },
+    label: 'Sol',
+  },
+  A: {
+    oct3: { bg: '#7A3AA8', glow: '#9A5AC8' },
+    oct4: { bg: '#C39BD3', glow: '#D8BAE8' },
+    oct5: { bg: '#DFD0F0', glow: '#EDE5F8' },
+    label: 'La',
+  },
+  B: {
+    oct3: { bg: '#CC3878', glow: '#E05898' },
+    oct4: { bg: '#F3A8C8', glow: '#F8C4DC' },
+    oct5: { bg: '#FAD0E2', glow: '#FCE4EE' },
+    label: 'Si',
+  },
 };
 
 // Three octaves of notes
