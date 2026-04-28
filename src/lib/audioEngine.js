@@ -54,11 +54,72 @@ export const NOTES_3OCT = [
 export const NOTES = ['C','D','E','F','G','A','B'];
 
 export const INSTRUMENTS = [
-  { id: 'piano',    name: '鋼琴',  emoji: '🎹' },
-  { id: 'xylophone',name: '木琴',  emoji: '🎼' },
-  { id: 'flute',    name: '笛子',  emoji: '🎵' },
-  { id: 'guitar',   name: '吉他',  emoji: '🎸' },
+  { id: 'piano',     name: '鋼琴',  emoji: '🎹' },
+  { id: 'xylophone', name: '木琴',  emoji: '🎼' },
+  { id: 'organ',     name: '風琴',  emoji: '🎶' },
+  { id: 'guitar',    name: '吉他',  emoji: '🎸' },
+  { id: 'drums',     name: '鼓聲',  emoji: '🥁' },
 ];
+
+// Drum note → frequency mapping (pitched percussion feel)
+const DRUM_FREQS = {
+  C: 80,   // kick
+  D: 200,  // snare low
+  E: 300,  // snare high
+  F: 600,  // hi-hat closed
+  G: 900,  // hi-hat open
+  A: 150,  // tom low
+  B: 250,  // tom high
+};
+
+function playDrum(letter, ctx) {
+  const freq = DRUM_FREQS[letter] || 200;
+  const isKick = letter === 'C';
+  const isHat = letter === 'F' || letter === 'G';
+
+  const gainNode = ctx.createGain();
+  gainNode.connect(ctx.destination);
+
+  if (isKick) {
+    // Kick: sine with pitch sweep down
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(160, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.25);
+    gainNode.gain.setValueAtTime(0.8, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+    osc.connect(gainNode);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.35);
+  } else if (isHat) {
+    // Hi-hat: white noise burst
+    const bufferSize = ctx.sampleRate * 0.1;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = letter === 'G' ? 5000 : 8000;
+    source.connect(filter);
+    filter.connect(gainNode);
+    gainNode.gain.setValueAtTime(0.4, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + (letter === 'G' ? 0.25 : 0.08));
+    source.start(ctx.currentTime);
+  } else {
+    // Snare / tom: sine + noise blend
+    const osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.5, ctx.currentTime + 0.15);
+    gainNode.gain.setValueAtTime(0.6, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+    osc.connect(gainNode);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.2);
+  }
+}
 
 // Instrument sound configs
 const INSTRUMENT_CONFIGS = {
@@ -80,14 +141,14 @@ const INSTRUMENT_CONFIGS = {
     decayTime: 0.7,
     peakGain: 0.5,
   },
-  flute: {
-    osc1Type: 'sine',
+  organ: {
+    osc1Type: 'square',
     osc2Type: 'sine',
     osc2Mult: 2,
-    filterFreq: 1200,
-    attackTime: 0.06,
-    decayTime: 1.5,
-    peakGain: 0.35,
+    filterFreq: 1500,
+    attackTime: 0.01,
+    decayTime: 1.8,
+    peakGain: 0.25,
   },
   guitar: {
     osc1Type: 'sawtooth',
@@ -105,6 +166,14 @@ export function playNote(note, instrument = 'piano') {
   const ctx = getAudioContext();
   // Support both 'C' and 'C4' formats
   const fullNote = /\d/.test(note) ? note : `${note}4`;
+  const letter = fullNote.slice(0, -1);
+
+  // Drums use a special engine
+  if (instrument === 'drums') {
+    playDrum(letter, ctx);
+    return;
+  }
+
   const freq = getNoteFreq(fullNote);
   if (!freq) return;
 
