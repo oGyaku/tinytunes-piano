@@ -11,6 +11,7 @@ import FreePlay from '@/pages/FreePlay';
 import SongMode from '@/pages/SongMode';
 import ColoringGame from '@/pages/ColoringGame';
 import PuzzleGame from '@/pages/PuzzleGame';
+import KlotskiGame from '@/pages/KlotskiGame';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -40,6 +41,7 @@ const AuthenticatedApp = () => {
       <Route path="/song-mode" element={<SongMode />} />
       <Route path="/coloring" element={<ColoringGame />} />
       <Route path="/puzzle" element={<PuzzleGame />} />
+      <Route path="/klotski" element={<KlotskiGame />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

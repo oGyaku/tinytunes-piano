@@ -7,114 +7,164 @@ const GAMES = [
     emoji: '🎹',
     title: 'Piano Kids',
     desc: '彈琴、學歌曲，音樂超好玩！',
-    gradient: 'from-[#F3A8A8] to-[#E8C1F4]',
-    stars: ['⭐','🌟','✨'],
+    bg: 'linear-gradient(135deg, #FFD6E7 0%, #FFC8E8 50%, #E8C1F4 100%)',
+    border: '#F3A8C8',
+    accent: '#D4608C',
+    deco: ['🎵','🎶','🎼'],
   },
   {
     to: '/coloring',
     emoji: '🎨',
     title: '台灣塗鴉樂園',
     desc: '幫台灣主題圖畫塗上美麗顏色！',
-    gradient: 'from-[#FCC190] to-[#F3A8A8]',
-    stars: ['🌸','🌺','🌷'],
+    bg: 'linear-gradient(135deg, #FFE8C8 0%, #FFDDB4 50%, #FFD6A0 100%)',
+    border: '#FFBB77',
+    accent: '#C07030',
+    deco: ['🖌️','🌈','✨'],
   },
   {
     to: '/puzzle',
     emoji: '🧩',
     title: '拼圖挑戰',
     desc: '拖拉拼圖，完成美麗圖案！',
-    gradient: 'from-[#A0D9C5] to-[#9FC2DD]',
-    stars: ['💎','🔮','💜'],
+    bg: 'linear-gradient(135deg, #C8F0E8 0%, #B8E8F0 50%, #C0E0F8 100%)',
+    border: '#80CCD8',
+    accent: '#2A8898',
+    deco: ['💎','🌊','⭐'],
+  },
+  {
+    to: '/klotski',
+    emoji: '🏯',
+    title: '華容道',
+    desc: '移動方塊，幫曹操逃出包圍！',
+    bg: 'linear-gradient(135deg, #F8E8C0 0%, #F0D8A8 50%, #E8C890 100%)',
+    border: '#D4A840',
+    accent: '#805010',
+    deco: ['👑','🗡️','🔮'],
   },
 ];
 
-const floatingItems = ['🌸','⭐','🌟','💕','🌈','✨','🎀','🍭','🌙','💫'];
+const BG_DECO = ['🌸','⭐','🌙','🦋','🌈','💫','🎀','🍭','🌺','✨','🐝','🌟'];
 
 export default function GameHub() {
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg, #FFF0F5 0%, #FFF9E6 50%, #F0FFFE 100%)' }}
+    <div className="min-h-screen relative overflow-hidden flex flex-col items-center p-4 pb-8"
+      style={{ background: 'linear-gradient(160deg, #FFF5FA 0%, #FFFBF0 40%, #F0FDFF 100%)' }}
     >
-      {/* Floating background decorations */}
+      {/* Scattered background decorations */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {floatingItems.map((item, i) => (
+        {BG_DECO.map((item, i) => (
           <motion.div
             key={i}
-            className="absolute text-2xl md:text-3xl"
-            style={{ left: `${(i * 11) % 95}%`, top: `${(i * 17) % 90}%` }}
-            animate={{ y: [0, -15, 0], rotate: [0, 10, -10, 0], opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 3 + i * 0.4, repeat: Infinity, delay: i * 0.3 }}
+            className="absolute"
+            style={{
+              left: `${[8,20,35,50,65,78,90,12,40,60,80,25][i]}%`,
+              top: `${[10,25,5,80,15,70,45,60,35,90,20,50][i]}%`,
+              fontSize: [20,16,22,18,24,16,20,18,22,16,20,18][i],
+              opacity: 0.25,
+            }}
+            animate={{
+              y: [0, -12, 0],
+              rotate: [0, 8, -8, 0],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{ duration: 3 + i * 0.3, repeat: Infinity, delay: i * 0.25 }}
           >
             {item}
           </motion.div>
         ))}
       </div>
 
-      <div className="relative z-10 flex flex-col items-center w-full max-w-md gap-6">
+      <div className="relative z-10 w-full max-w-lg flex flex-col items-center gap-5 pt-4">
         {/* Header */}
         <motion.div
-          initial={{ y: -40, opacity: 0 }}
+          initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 100 }}
           className="text-center"
         >
+          {/* Castle illustration */}
           <motion.div
-            animate={{ rotate: [0, -5, 5, -5, 0], scale: [1, 1.05, 1] }}
-            transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-            className="text-6xl md:text-7xl mb-3"
+            animate={{ y: [0, -6, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            className="text-7xl md:text-8xl mb-2 inline-block"
           >
             🏰
           </motion.div>
-          <h1 className="font-fredoka text-3xl md:text-4xl font-bold"
-            style={{ background: 'linear-gradient(135deg, #F3A8A8, #C39BD3, #A0D9C5)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+          <div className="relative inline-block">
+            <h1 className="font-fredoka text-4xl md:text-5xl font-bold tracking-wide"
+              style={{
+                background: 'linear-gradient(135deg, #FF6BA8 0%, #A855C8 40%, #4B8FD8 80%, #3CB8A0 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                textShadow: 'none',
+              }}
+            >
+              童話遊樂園
+            </h1>
+          </div>
+          <motion.p
+            className="font-fredoka text-base mt-1"
+            style={{ color: '#B06090' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
           >
-            童話遊樂園
-          </h1>
-          <p className="font-fredoka text-muted-foreground mt-1 text-base">
-            選一個遊戲，一起玩吧！ 🎉
-          </p>
+            ✨ 選一個遊戲，一起玩吧！✨
+          </motion.p>
         </motion.div>
 
-        {/* Game cards */}
-        <div className="flex flex-col gap-4 w-full">
+        {/* Game cards — 2-column grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
           {GAMES.map((game, i) => (
             <motion.div
               key={game.to}
-              initial={{ x: i % 2 === 0 ? -60 : 60, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2 + i * 0.15, type: 'spring' }}
+              initial={{ scale: 0.8, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + i * 0.1, type: 'spring', stiffness: 180 }}
             >
               <Link to={game.to}>
                 <motion.div
-                  whileHover={{ scale: 1.03, y: -3 }}
+                  whileHover={{ scale: 1.04, y: -4, boxShadow: `0 12px 40px ${game.border}88` }}
                   whileTap={{ scale: 0.97 }}
-                  className={`bg-gradient-to-r ${game.gradient} rounded-3xl p-5 md:p-6 shadow-lg cursor-pointer select-none flex items-center gap-4`}
-                  style={{ boxShadow: '0 8px 30px rgba(243,168,168,0.3)' }}
+                  className="relative overflow-hidden rounded-3xl p-5 cursor-pointer select-none"
+                  style={{
+                    background: game.bg,
+                    border: `2.5px solid ${game.border}`,
+                    boxShadow: `0 6px 20px ${game.border}55`,
+                  }}
                 >
-                  <motion.span
-                    className="text-4xl md:text-5xl"
-                    animate={{ rotate: [0, -5, 5, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
+                  {/* Decorative corner */}
+                  <div className="absolute -top-3 -right-3 text-3xl opacity-30 rotate-12">
+                    {game.deco[2]}
+                  </div>
+
+                  {/* Main emoji */}
+                  <motion.div
+                    className="text-5xl mb-2 inline-block"
+                    animate={{ rotate: [0, -6, 6, 0] }}
+                    transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.6 }}
                   >
                     {game.emoji}
-                  </motion.span>
-                  <div className="flex-1">
-                    <h2 className="font-fredoka text-xl md:text-2xl font-bold text-white drop-shadow">
-                      {game.title}
-                    </h2>
-                    <p className="font-fredoka text-white/85 text-sm mt-0.5">
-                      {game.desc}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    {game.stars.map((s, j) => (
+                  </motion.div>
+
+                  <h2 className="font-fredoka text-lg font-bold mb-0.5" style={{ color: game.accent }}>
+                    {game.title}
+                  </h2>
+                  <p className="font-fredoka text-sm" style={{ color: `${game.accent}cc` }}>
+                    {game.desc}
+                  </p>
+
+                  {/* Bottom deco row */}
+                  <div className="flex gap-1.5 mt-3">
+                    {game.deco.map((d, j) => (
                       <motion.span
                         key={j}
-                        className="text-sm"
-                        animate={{ opacity: [0.5, 1, 0.5] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: j * 0.3 }}
+                        className="text-base"
+                        animate={{ opacity: [0.4, 0.9, 0.4], y: [0, -3, 0] }}
+                        transition={{ duration: 1.8, repeat: Infinity, delay: j * 0.3 }}
                       >
-                        {s}
+                        {d}
                       </motion.span>
                     ))}
                   </div>
@@ -124,18 +174,18 @@ export default function GameHub() {
           ))}
         </div>
 
-        {/* Bottom decoration */}
+        {/* Bottom animals */}
         <motion.div
-          className="flex gap-3 text-2xl"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          className="flex gap-4 text-3xl mt-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
         >
-          {['🐰','🐻','🦊','🐸','🐱'].map((e, i) => (
+          {['🐰','🐻','🦊','🐸','🐱','🐼'].map((e, i) => (
             <motion.span
               key={i}
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
+              animate={{ y: [0, -10, 0], rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 1.6, delay: i * 0.18, repeat: Infinity }}
             >
               {e}
             </motion.span>

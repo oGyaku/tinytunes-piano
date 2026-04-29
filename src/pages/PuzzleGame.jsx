@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// Keep as BUILTIN for internal use
 const BUILTIN = [
   { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/0fc37d2e1_puzzle1.jpg', label: '彩虹雲朵', emoji: '🌈', diffKey: 'easy',   cols: 3 },
   { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/4a025a342_puzzle2.JPG', label: '台灣美食', emoji: '🧋', diffKey: 'easy',   cols: 3 },
@@ -23,8 +24,10 @@ const DIFF_INFO = {
 };
 
 export default function PuzzleGame() {
+  const [allPuzzles, setAllPuzzles] = useState(BUILTIN);
   const [phase, setPhase] = useState('home'); // home | playing | win
   const [selected, setSelected] = useState(null);
+  const fileInputRef = useRef(null);
   const [board, setBoard] = useState([]);
   const [moves, setMoves] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -33,6 +36,19 @@ export default function PuzzleGame() {
   const [showHint, setShowHint] = useState(false);
   const timerRef = useRef(null);
   const boardRef = useRef(null);
+
+  const handleUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const newItem = { src: url, label: '我的圖片', emoji: '🖼️', diffKey: 'medium', cols: 4 };
+    setAllPuzzles(prev => {
+      const filtered = prev.filter(p => p.label !== '我的圖片');
+      return [...filtered, newItem];
+    });
+    startGame(newItem);
+    e.target.value = '';
+  };
 
   // Timer
   useEffect(() => {
@@ -108,7 +124,18 @@ export default function PuzzleGame() {
         <div className="flex-1 px-4 pb-8">
           <p className="font-fredoka text-center text-muted-foreground mb-4">選一張圖片開始拼圖吧！🌟</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {BUILTIN.map((item, i) => {
+            {/* Upload card */}
+            <motion.div
+              whileHover={{ scale: 1.05, y: -4 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => fileInputRef.current?.click()}
+              className="bg-white/85 rounded-3xl p-2 shadow-md cursor-pointer overflow-hidden border-2 border-dashed border-blue-300 flex flex-col items-center justify-center gap-2 aspect-square"
+            >
+              <span className="text-4xl">📁</span>
+              <div className="font-fredoka text-sm font-semibold text-blue-500 text-center">上傳自己的圖片</div>
+            </motion.div>
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+            {allPuzzles.map((item, i) => {
               const diff = DIFF_INFO[item.diffKey];
               return (
                 <motion.div

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const SCENES = [
+const BUILTIN_SCENES = [
   { id: 'blank',   emoji: '⬜', name: '空白畫布',    img: null },
   { id: 'train',   emoji: '🚂', name: '阿里山小火車', img: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/ca34f92fe_Train.png' },
   { id: 'zongzi',  emoji: '🍙', name: '肉粽',         img: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/eecc9413b_Zongzi.png' },
@@ -30,25 +30,21 @@ const COLORS = [
   '#111111','#777777','#FFFFFF',
 ];
 
+// 36 stickers in 6 rows of 6 — even grid on all screen sizes
 const STICKERS = [
-  // Nature & Sky
-  '⭐','🌙','☀️','🌈','⛅','❄️',
-  // Flowers & Plants
+  '⭐','🌙','☀️','🌈','❄️','⛅',
   '🌸','🌺','🌻','🍀','🌿','🍁',
-  // Animals
   '🦋','🐝','🐞','🐠','🦜','🦊',
-  // Food & Sweets
   '🍭','🍩','🎂','🍓','🍊','🍕',
-  // Symbols & Hearts
   '❤️','💜','💛','🎵','🎀','💎',
-  // Taiwan special
   '🏮','🧧','🥢','🍵','🎋','🐉',
 ];
 
 const BRUSH_SIZES = [5, 12, 24];
 
 export default function ColoringGame() {
-  const [currentScene, setCurrentScene] = useState(SCENES[0]);
+  const [scenes, setScenes] = useState(BUILTIN_SCENES);
+  const [currentScene, setCurrentScene] = useState(BUILTIN_SCENES[0]);
   const [currentColor, setCurrentColor] = useState('#CC2222');
   const [brushSize, setBrushSize] = useState(12);
   const [tool, setTool] = useState('brush');
@@ -61,25 +57,21 @@ export default function ColoringGame() {
   const isDrawing = useRef(false);
   const lastPos   = useRef({ x: 0, y: 0 });
   const history   = useRef([]);
+  const currentSceneRef = useRef(BUILTIN_SCENES[0]);
+  const fileInputRef = useRef(null);
 
   const loadScene = useCallback((scene, w, h) => {
     const bCtx = baseRef.current?.getContext('2d');
     const dCtx = drawRef.current?.getContext('2d');
     const iCtx = imgRef.current?.getContext('2d');
     if (!bCtx || !dCtx || !iCtx) return;
-    bCtx.clearRect(0, 0, w, h);
-    dCtx.clearRect(0, 0, w, h);
-    iCtx.clearRect(0, 0, w, h);
-    bCtx.fillStyle = '#FFFFFF';
-    bCtx.fillRect(0, 0, w, h);
+    bCtx.clearRect(0, 0, w, h); dCtx.clearRect(0, 0, w, h); iCtx.clearRect(0, 0, w, h);
+    bCtx.fillStyle = '#FFFFFF'; bCtx.fillRect(0, 0, w, h);
     history.current = [];
     if (!scene.img) return;
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      // square images: fill canvas fully
-      iCtx.drawImage(img, 0, 0, w, h);
-    };
+    img.onload = () => iCtx.drawImage(img, 0, 0, w, h);
     img.src = scene.img;
   }, []);
 
@@ -87,25 +79,36 @@ export default function ColoringGame() {
     const wrap = baseRef.current?.parentElement;
     if (!wrap) return;
     const size = wrap.clientWidth - 6;
-    const canvases = [baseRef.current, drawRef.current, imgRef.current, eventRef.current];
-    canvases.forEach(c => { if (c) { c.width = size; c.height = size; } });
+    [baseRef, drawRef, imgRef, eventRef].forEach(r => {
+      if (r.current) { r.current.width = size; r.current.height = size; }
+    });
     loadScene(scene, size, size);
   }, [loadScene]);
 
   useEffect(() => {
-    const s = SCENES[0];
-    setCurrentScene(s);
-    setTimeout(() => resize(s), 50);
+    setTimeout(() => resize(BUILTIN_SCENES[0]), 50);
     const handler = () => resize(currentSceneRef.current);
     window.addEventListener('resize', handler);
     return () => window.removeEventListener('resize', handler);
-  }, []);
+  }, [resize]);
 
-  const currentSceneRef = useRef(SCENES[0]);
   const handleSelectScene = (scene) => {
     setCurrentScene(scene);
     currentSceneRef.current = scene;
     resize(scene);
+  };
+
+  const handleUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const newScene = { id: `upload_${Date.now()}`, emoji: '🖼️', name: '我的圖片', img: url };
+    setScenes(prev => {
+      const filtered = prev.filter(s => !s.id.startsWith('upload_'));
+      return [...filtered, newScene];
+    });
+    handleSelectScene(newScene);
+    e.target.value = '';
   };
 
   const getPos = (e) => {
@@ -129,8 +132,7 @@ export default function ColoringGame() {
     if (tool === 'sticker') {
       saveHistory();
       dCtx.font = `${brushSize * 2 + 18}px serif`;
-      dCtx.textAlign = 'center';
-      dCtx.textBaseline = 'middle';
+      dCtx.textAlign = 'center'; dCtx.textBaseline = 'middle';
       dCtx.fillText(currentSticker, x, y);
       return;
     }
@@ -140,8 +142,7 @@ export default function ColoringGame() {
     dCtx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
     dCtx.beginPath();
     dCtx.arc(x, y, (tool === 'eraser' ? brushSize * 2 : brushSize) / 2, 0, Math.PI * 2);
-    dCtx.fillStyle = currentColor;
-    dCtx.fill();
+    dCtx.fillStyle = currentColor; dCtx.fill();
   };
 
   const onDraw = (e) => {
@@ -155,9 +156,7 @@ export default function ColoringGame() {
     dCtx.lineTo(x, y);
     dCtx.strokeStyle = currentColor;
     dCtx.lineWidth = tool === 'eraser' ? brushSize * 2 : brushSize;
-    dCtx.lineCap = 'round';
-    dCtx.lineJoin = 'round';
-    dCtx.stroke();
+    dCtx.lineCap = 'round'; dCtx.lineJoin = 'round'; dCtx.stroke();
     lastPos.current = { x, y };
   };
 
@@ -193,7 +192,7 @@ export default function ColoringGame() {
       {/* Scene strip */}
       <div className="px-3 pb-1 shrink-0">
         <div className="flex gap-1.5 overflow-x-auto pb-1">
-          {SCENES.map(scene => (
+          {scenes.map(scene => (
             <motion.button
               key={scene.id}
               whileTap={{ scale: 0.92 }}
@@ -206,75 +205,92 @@ export default function ColoringGame() {
               <span className="whitespace-nowrap">{scene.name}</span>
             </motion.button>
           ))}
+          {/* Upload button */}
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={() => fileInputRef.current?.click()}
+            className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-2xl font-fredoka text-[11px] font-semibold shrink-0 bg-white/80 border-2 border-dashed border-pink-300 text-pink-400"
+          >
+            <span className="text-base">📁</span>
+            <span className="whitespace-nowrap">上傳圖片</span>
+          </motion.button>
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
         </div>
       </div>
 
-      {/* MAIN: color bar (top on mobile) + canvas + tools */}
+      {/* MAIN LAYOUT */}
       <div className="flex-1 flex flex-col md:flex-row gap-2 px-2 pb-3 min-h-0">
 
-        {/* TOP / LEFT: Color palette — horizontal on mobile, vertical sidebar on desktop */}
-        <div className="bg-white/85 rounded-2xl shadow p-2 shrink-0 flex md:flex-col gap-2 md:w-28 overflow-x-auto md:overflow-x-visible">
-          {/* Colors */}
-          <div className="shrink-0">
-            <div className="font-fredoka text-[10px] text-muted-foreground text-center mb-1">🎨 顏色</div>
-            <div className="grid grid-cols-10 md:grid-cols-3 gap-1">
-              {COLORS.map(c => (
-                <button
-                  key={c}
-                  onClick={() => { setCurrentColor(c); setTool('brush'); }}
-                  className="rounded-full transition-all hover:scale-110 shrink-0"
-                  style={{
-                    background: c,
-                    width: 22, height: 22,
-                    border: currentColor === c ? '3px solid #333' : '2px solid rgba(0,0,0,0.1)',
-                    transform: currentColor === c ? 'scale(1.25)' : '',
-                    outline: c === '#FFFFFF' ? '1px solid #ccc' : 'none',
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="hidden md:block w-full h-px bg-gray-100 my-1" />
-          <div className="md:hidden w-px bg-gray-200 mx-1 self-stretch" />
-
-          {/* Brush + tools row */}
-          <div className="flex md:flex-col gap-2 items-center shrink-0">
-            <div>
-              <div className="font-fredoka text-[10px] text-muted-foreground text-center mb-1">🖌️ 筆</div>
-              <div className="flex md:flex-col gap-1 items-center">
-                {BRUSH_SIZES.map(s => (
+        {/* Color / Tool sidebar — horizontal strip on mobile, vertical on desktop */}
+        <div className="bg-white/85 rounded-2xl shadow p-2 shrink-0 md:w-28 overflow-x-auto md:overflow-visible">
+          <div className="flex md:flex-col gap-3 md:gap-2 min-w-max md:min-w-0">
+            {/* Colors */}
+            <div className="shrink-0">
+              <div className="font-fredoka text-[10px] text-muted-foreground text-center mb-1">🎨 顏色</div>
+              <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(10, 22px)' }}
+                   /* desktop: 3 cols */ 
+              >
+                <style>{`@media(min-width:768px){.color-grid{grid-template-columns:repeat(3,22px)!important}}`}</style>
+                <div className="color-grid grid gap-1 col-span-10 md:col-span-1"
+                  style={{ gridTemplateColumns: 'repeat(10, 22px)' }}
+                >
+                  {/* This inner div handles responsive columns via inline + className approach */}
+                </div>
+              </div>
+              {/* Simpler approach: just render colors, CSS handles columns */}
+              <div className="flex flex-wrap gap-1" style={{ maxWidth: 240 }}>
+                {COLORS.map(c => (
                   <button
-                    key={s}
-                    onClick={() => setBrushSize(s)}
-                    className={`flex items-center justify-center rounded-full border-2 transition-all ${brushSize === s ? 'border-pink-400 bg-pink-50' : 'border-transparent bg-gray-100'}`}
-                    style={{ width: 28 + s, height: 28 + s }}
-                  >
-                    <div className="rounded-full bg-gray-700" style={{ width: s * 0.5 + 2, height: s * 0.5 + 2 }} />
-                  </button>
+                    key={c}
+                    onClick={() => { setCurrentColor(c); setTool('brush'); }}
+                    className="rounded-full transition-all hover:scale-110 shrink-0"
+                    style={{
+                      background: c, width: 22, height: 22,
+                      border: currentColor === c ? '3px solid #333' : '2px solid rgba(0,0,0,0.1)',
+                      transform: currentColor === c ? 'scale(1.25)' : '',
+                      outline: c === '#FFFFFF' ? '1px solid #ccc' : 'none',
+                    }}
+                  />
                 ))}
               </div>
             </div>
-            <div className="flex md:flex-col gap-1">
-              {[{ id: 'brush', label: '✏️' }, { id: 'eraser', label: '🧹' }].map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => setTool(t.id)}
-                  title={t.id === 'brush' ? '畫筆' : '橡皮擦'}
-                  className={`text-base p-1.5 rounded-xl border-2 transition-all ${tool === t.id ? 'border-pink-400 bg-pink-50' : 'border-transparent bg-gray-100'}`}
-                >
-                  {t.label}
-                </button>
-              ))}
-              <button onClick={undo} title="上一步" className="text-base p-1.5 rounded-xl bg-gray-100 hover:bg-gray-200">↩️</button>
-              <button onClick={clearAll} title="清除" className="text-base p-1.5 rounded-xl bg-red-50 hover:bg-red-100">🗑️</button>
+
+            {/* Divider */}
+            <div className="md:hidden w-px bg-gray-200 self-stretch mx-1 shrink-0" />
+            <div className="hidden md:block h-px bg-gray-100 w-full" />
+
+            {/* Brush + tools */}
+            <div className="flex md:flex-col gap-2 items-start shrink-0">
+              <div>
+                <div className="font-fredoka text-[10px] text-muted-foreground text-center mb-1">🖌️ 筆</div>
+                <div className="flex md:flex-col gap-1 items-center">
+                  {BRUSH_SIZES.map(s => (
+                    <button key={s}
+                      onClick={() => setBrushSize(s)}
+                      className={`flex items-center justify-center rounded-full border-2 transition-all shrink-0 ${brushSize === s ? 'border-pink-400 bg-pink-50' : 'border-transparent bg-gray-100'}`}
+                      style={{ width: 26 + s, height: 26 + s }}
+                    >
+                      <div className="rounded-full bg-gray-700" style={{ width: s * 0.5 + 2, height: s * 0.5 + 2 }} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex md:flex-col gap-1 shrink-0">
+                {[{ id: 'brush', label: '✏️' }, { id: 'eraser', label: '🧹' }].map(t => (
+                  <button key={t.id} onClick={() => setTool(t.id)} title={t.id === 'brush' ? '畫筆' : '橡皮擦'}
+                    className={`text-lg p-1.5 rounded-xl border-2 transition-all ${tool === t.id ? 'border-pink-400 bg-pink-50' : 'border-transparent bg-gray-100'}`}
+                  >{t.label}</button>
+                ))}
+                <button onClick={undo} className="text-lg p-1.5 rounded-xl bg-gray-100 hover:bg-gray-200">↩️</button>
+                <button onClick={clearAll} className="text-lg p-1.5 rounded-xl bg-red-50 hover:bg-red-100">🗑️</button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Canvas — square, fills remaining space */}
-        <div className="flex-1 flex flex-col gap-2 min-w-0">
+        {/* Canvas + Stickers */}
+        <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0">
+          {/* Canvas */}
           <div className="flex-1 bg-white/85 rounded-2xl shadow p-1.5 flex items-center justify-center min-h-0">
             <div className="relative w-full" style={{ maxWidth: 560 }}>
               <div className="relative rounded-xl overflow-hidden" style={{ border: '3px dashed #F3A8A8', aspectRatio: '1 / 1' }}>
@@ -290,15 +306,15 @@ export default function ColoringGame() {
             </div>
           </div>
 
-          {/* Stickers */}
+          {/* Stickers — 6 columns, 6 rows = 36 total, always even */}
           <div className="bg-white/85 rounded-2xl shadow px-3 py-2 shrink-0">
             <div className="font-fredoka text-[10px] text-muted-foreground mb-1.5 text-center">🎀 印章貼紙</div>
-            <div className="flex flex-wrap gap-1 justify-center">
+            <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
               {STICKERS.map(s => (
                 <button
                   key={s}
                   onClick={() => { setCurrentSticker(s); setTool('sticker'); }}
-                  className={`text-lg p-1 rounded-xl border-2 transition-all hover:scale-125
+                  className={`text-xl aspect-square rounded-xl border-2 transition-all hover:scale-125 flex items-center justify-center
                     ${tool === 'sticker' && currentSticker === s ? 'border-yellow-400 bg-yellow-50 scale-110' : 'border-transparent bg-gray-50'}`}
                 >
                   {s}
