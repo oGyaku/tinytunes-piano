@@ -1,8 +1,8 @@
 import { NOTES_3OCT } from '@/lib/audioEngine';
 import PianoKey from './PianoKey';
 
-// Group into octaves for visual separation
-const OCTAVES = [3, 4, 5];
+// Oct5 = high (top, lightest), Oct3 = low (bottom, darkest)
+const OCTAVES = [5, 4, 3];
 const LETTERS = ['C','D','E','F','G','A','B'];
 
 export default function PianoKeyboard({ highlightedNote, onPlay, instrument = 'piano' }) {
