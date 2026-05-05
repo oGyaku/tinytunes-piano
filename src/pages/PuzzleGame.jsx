@@ -4,30 +4,51 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// Keep as BUILTIN for internal use
 const BUILTIN = [
-  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/0fc37d2e1_puzzle1.jpg', label: '彩虹雲朵', emoji: '🌈', diffKey: 'easy',   cols: 3 },
-  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/4a025a342_puzzle2.JPG', label: '台灣美食', emoji: '🧋', diffKey: 'easy',   cols: 3 },
-  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/573ae4c35_puzzle3.jpg', label: '公園遊樂', emoji: '🌳', diffKey: 'medium', cols: 4 },
-  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/c0477494c_puzzle4.JPG', label: '女王頭岩', emoji: '🪨', diffKey: 'medium', cols: 4 },
-  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/9912d1a82_puzzle5.JPG', label: '阿里山火車', emoji: '🚂', diffKey: 'hard',   cols: 5 },
-  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/82a3437a7_puzzle6.JPG', label: '自由廣場', emoji: '🏛️', diffKey: 'hard',   cols: 5 },
-  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/c6089defd_puzzle7.JPG', label: '平溪天燈', emoji: '🏮', diffKey: 'expert', cols: 6 },
-  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/144b00e03_puzzle8.JPG', label: '台北101',  emoji: '🏙️', diffKey: 'expert', cols: 6 },
+  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/0fc37d2e1_puzzle1.jpg', label: '彩虹雲朵', emoji: '🌈' },
+  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/4a025a342_puzzle2.JPG', label: '台灣美食', emoji: '🧋' },
+  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/573ae4c35_puzzle3.jpg', label: '公園遊樂', emoji: '🌳' },
+  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/c0477494c_puzzle4.JPG', label: '女王頭岩', emoji: '🪨' },
+  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/9912d1a82_puzzle5.JPG', label: '阿里山火車', emoji: '🚂' },
+  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/82a3437a7_puzzle6.JPG', label: '自由廣場', emoji: '🏛️' },
+  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/c6089defd_puzzle7.JPG', label: '平溪天燈', emoji: '🏮' },
+  { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/144b00e03_puzzle8.JPG', label: '台北101', emoji: '🏙️' },
 ];
 
-const DIFF_INFO = {
-  easy:   { label: '😊 簡單', color: 'from-[#A0D9C5] to-[#6BCB77]' },
-  medium: { label: '🤔 中等', color: 'from-[#FCC190] to-[#FF9F43]' },
-  hard:   { label: '😤 困難', color: 'from-[#F3A8A8] to-[#FF6B6B]' },
-  expert: { label: '🤯 高手', color: 'from-[#E8C1F4] to-[#9B59B6]' },
-};
+const DIFFICULTIES = [
+  { key: 'easy',   label: '😊 簡單', cols: 3, desc: '3×3 = 9片' },
+  { key: 'medium', label: '🤔 中等', cols: 4, desc: '4×4 = 16片' },
+  { key: 'hard',   label: '😤 困難', cols: 5, desc: '5×5 = 25片' },
+  { key: 'expert', label: '🤯 高手', cols: 6, desc: '6×6 = 36片' },
+];
+
+// Crop image to centre square, return a data URL
+function cropToSquare(file) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const size = Math.min(img.width, img.height);
+      const sx = (img.width - size) / 2;
+      const sy = (img.height - size) / 2;
+      const canvas = document.createElement('canvas');
+      canvas.width = 600;
+      canvas.height = 600;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, 600, 600);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.92));
+    };
+    img.src = url;
+  });
+}
 
 export default function PuzzleGame() {
-  const [allPuzzles, setAllPuzzles] = useState(BUILTIN);
-  const [phase, setPhase] = useState('home'); // home | playing | win
+  // phase: 'home' | 'setup' | 'playing' | 'win'
+  const [phase, setPhase] = useState('home');
+  const [uploadedImg, setUploadedImg] = useState(null); // { src, label, emoji }
   const [selected, setSelected] = useState(null);
-  const fileInputRef = useRef(null);
+  const [difficulty, setDifficulty] = useState(DIFFICULTIES[1]);
   const [board, setBoard] = useState([]);
   const [moves, setMoves] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -35,22 +56,17 @@ export default function PuzzleGame() {
   const [touchSrc, setTouchSrc] = useState(null);
   const [showHint, setShowHint] = useState(false);
   const timerRef = useRef(null);
-  const boardRef = useRef(null);
+  const fileInputRef = useRef(null);
 
-  const handleUpload = (e) => {
+  const handleUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    const newItem = { src: url, label: '我的圖片', emoji: '🖼️', diffKey: 'medium', cols: 4 };
-    setAllPuzzles(prev => {
-      const filtered = prev.filter(p => p.label !== '我的圖片');
-      return [...filtered, newItem];
-    });
-    startGame(newItem);
+    const dataUrl = await cropToSquare(file);
+    const img = { src: dataUrl, label: '我的圖片', emoji: '🖼️' };
+    setUploadedImg(img);
     e.target.value = '';
   };
 
-  // Timer
   useEffect(() => {
     if (phase === 'playing') {
       timerRef.current = setInterval(() => setSeconds(s => s + 1), 1000);
@@ -60,8 +76,8 @@ export default function PuzzleGame() {
     return () => clearInterval(timerRef.current);
   }, [phase]);
 
-  const startGame = (item) => {
-    const cols = item.cols;
+  const startGame = (item, diff) => {
+    const cols = diff.cols;
     const total = cols * cols;
     const arr = Array.from({ length: total }, (_, i) => i);
     for (let i = total - 1; i > 0; i--) {
@@ -76,7 +92,7 @@ export default function PuzzleGame() {
   };
 
   const swap = (posA, posB) => {
-    if (posA === posB) return;
+    if (posA === null || posA === undefined || posA === posB) return;
     setBoard(prev => {
       const next = [...prev];
       [next[posA], next[posB]] = [next[posB], next[posA]];
@@ -85,7 +101,6 @@ export default function PuzzleGame() {
     setMoves(m => m + 1);
   };
 
-  // Check win after board changes
   useEffect(() => {
     if (phase !== 'playing' || board.length === 0) return;
     if (board.every((v, i) => v === i)) {
@@ -94,18 +109,16 @@ export default function PuzzleGame() {
   }, [board]);
 
   const fmt = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-
   const correct = board.filter((v, i) => v === i).length;
-  const total = board.length;
-  const pct = total ? Math.round((correct / total) * 100) : 0;
+  const pct = board.length ? Math.round((correct / board.length) * 100) : 0;
+  const pieceSize = selected
+    ? Math.min(Math.floor((Math.min(typeof window !== 'undefined' ? window.innerWidth - 80 : 320, 480)) / difficulty.cols), 88)
+    : 60;
 
-  // Piece size
-  const pieceSize = selected ? Math.min(Math.floor((Math.min(typeof window !== 'undefined' ? window.innerWidth - 80 : 320, 480)) / selected.cols), 90) : 60;
+  const allImages = uploadedImg ? [uploadedImg, ...BUILTIN] : BUILTIN;
 
   return (
-    <div className="min-h-screen flex flex-col"
-      style={{ background: 'linear-gradient(180deg, #D4EEFF 0%, #C8F0E8 100%)' }}
-    >
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #D4EEFF 0%, #C8F0E8 100%)' }}>
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <Link to="/">
@@ -113,50 +126,82 @@ export default function PuzzleGame() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
         </Link>
-        <h1 className="font-fredoka text-xl font-bold" style={{ color: '#5B9EC9' }}>
-          🧩 拼圖挑戰
-        </h1>
+        <h1 className="font-fredoka text-xl font-bold" style={{ color: '#5B9EC9' }}>🧩 拼圖挑戰</h1>
         <div className="w-10" />
       </div>
 
       {/* HOME */}
       {phase === 'home' && (
-        <div className="flex-1 px-4 pb-8">
-          <p className="font-fredoka text-center text-muted-foreground mb-4">選一張圖片開始拼圖吧！🌟</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {/* Upload card */}
-            <motion.div
-              whileHover={{ scale: 1.05, y: -4 }}
-              whileTap={{ scale: 0.95 }}
+        <div className="flex-1 px-4 pb-8 flex flex-col gap-6 max-w-2xl mx-auto w-full">
+
+          {/* Upload section */}
+          <div className="bg-white/70 rounded-3xl p-4 shadow-md">
+            <h2 className="font-fredoka text-base font-bold mb-3" style={{ color: '#5B9EC9' }}>📤 上傳自己的圖片</h2>
+            <div
               onClick={() => fileInputRef.current?.click()}
-              className="bg-white/85 rounded-3xl p-2 shadow-md cursor-pointer overflow-hidden border-2 border-dashed border-blue-300 flex flex-col items-center justify-center gap-2 aspect-square"
+              className="border-2 border-dashed border-blue-300 rounded-2xl p-4 cursor-pointer flex items-center gap-4 hover:bg-blue-50/50 transition-all"
             >
-              <span className="text-4xl">📁</span>
-              <div className="font-fredoka text-sm font-semibold text-blue-500 text-center">上傳自己的圖片</div>
-            </motion.div>
+              {uploadedImg ? (
+                <>
+                  <img src={uploadedImg.src} className="w-16 h-16 rounded-xl object-cover shadow" alt="uploaded" />
+                  <div>
+                    <div className="font-fredoka font-semibold text-sm text-green-600">✅ 圖片已上傳！</div>
+                    <div className="font-fredoka text-xs text-muted-foreground mt-0.5">點擊可重新上傳</div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <span className="text-4xl">📁</span>
+                  <div>
+                    <div className="font-fredoka font-semibold text-sm text-blue-500">點擊上傳圖片</div>
+                    <div className="font-fredoka text-xs text-muted-foreground mt-0.5">系統自動裁切正中心正方形</div>
+                  </div>
+                </>
+              )}
+            </div>
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
-            {allPuzzles.map((item, i) => {
-              const diff = DIFF_INFO[item.diffKey];
-              return (
+          </div>
+
+          {/* Difficulty section */}
+          <div className="bg-white/70 rounded-3xl p-4 shadow-md">
+            <h2 className="font-fredoka text-base font-bold mb-3" style={{ color: '#5B9EC9' }}>🎯 選擇難度</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {DIFFICULTIES.map(d => (
+                <button
+                  key={d.key}
+                  onClick={() => setDifficulty(d)}
+                  className={`rounded-2xl p-3 font-fredoka text-sm font-semibold transition-all border-2 ${
+                    difficulty.key === d.key
+                      ? 'border-blue-400 bg-blue-100 text-blue-700 shadow-md scale-105'
+                      : 'border-transparent bg-white/60 text-foreground hover:bg-white'
+                  }`}
+                >
+                  <div>{d.label}</div>
+                  <div className="text-xs font-normal opacity-70 mt-0.5">{d.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Image grid */}
+          <div>
+            <h2 className="font-fredoka text-base font-bold mb-3 px-1" style={{ color: '#5B9EC9' }}>🖼️ 選擇圖片</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {allImages.map((item, i) => (
                 <motion.div
                   key={i}
-                  whileHover={{ scale: 1.05, y: -4 }}
+                  whileHover={{ scale: 1.05, y: -3 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => startGame(item)}
+                  onClick={() => startGame(item, difficulty)}
                   className="bg-white/85 rounded-3xl p-2 shadow-md cursor-pointer overflow-hidden"
                 >
-                  <div className="relative">
-                    <img src={item.src} alt={item.label} className="w-full aspect-square object-cover rounded-2xl" />
-                    <div className={`absolute top-2 left-2 bg-gradient-to-r ${diff.color} text-white font-fredoka text-xs px-2 py-0.5 rounded-full shadow`}>
-                      {diff.label}
-                    </div>
-                  </div>
+                  <img src={item.src} alt={item.label} className="w-full aspect-square object-cover rounded-2xl" />
                   <div className="text-center mt-2 font-fredoka text-sm font-semibold text-foreground">
                     {item.emoji} {item.label}
                   </div>
                 </motion.div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -164,12 +209,8 @@ export default function PuzzleGame() {
       {/* PLAYING */}
       {phase === 'playing' && selected && (
         <div className="flex-1 flex flex-col items-center gap-3 px-4 pb-6">
-          {/* Stats bar */}
           <div className="flex gap-3 items-center w-full max-w-lg">
-            <button
-              onClick={() => setPhase('home')}
-              className="font-fredoka text-sm bg-white/80 rounded-2xl px-3 py-1.5 shadow hover:bg-white transition-all"
-            >
+            <button onClick={() => setPhase('home')} className="font-fredoka text-sm bg-white/80 rounded-2xl px-3 py-1.5 shadow hover:bg-white transition-all">
               ← 回選擇
             </button>
             <div className="flex-1 bg-white/60 rounded-2xl px-3 py-1.5 text-center">
@@ -180,34 +221,26 @@ export default function PuzzleGame() {
             </div>
           </div>
 
-          {/* Progress */}
           <div className="w-full max-w-lg">
             <div className="h-3 rounded-full bg-white/50 overflow-hidden">
-              <motion.div
-                className="h-full rounded-full"
-                style={{ background: 'linear-gradient(90deg, #A0D9C5, #FFD93D)' }}
-                animate={{ width: `${pct}%` }}
-                transition={{ duration: 0.3 }}
-              />
+              <motion.div className="h-full rounded-full" style={{ background: 'linear-gradient(90deg, #A0D9C5, #FFD93D)' }} animate={{ width: `${pct}%` }} transition={{ duration: 0.3 }} />
             </div>
             <div className="font-fredoka text-xs text-center text-white/80 mt-0.5">進度 {pct}%</div>
           </div>
 
-          {/* Board + hint */}
           <div className="relative">
             <div
-              ref={boardRef}
               className="grid gap-0.5 p-1.5 rounded-2xl shadow-xl"
               style={{
-                gridTemplateColumns: `repeat(${selected.cols}, ${pieceSize}px)`,
+                gridTemplateColumns: `repeat(${difficulty.cols}, ${pieceSize}px)`,
                 background: 'rgba(255,255,255,0.3)',
                 border: '3px solid rgba(255,255,255,0.5)',
               }}
             >
               {board.map((tileIdx, pos) => {
-                const col = tileIdx % selected.cols;
-                const row = Math.floor(tileIdx / selected.cols);
-                const totalPx = pieceSize * selected.cols;
+                const col = tileIdx % difficulty.cols;
+                const row = Math.floor(tileIdx / difficulty.cols);
+                const totalPx = pieceSize * difficulty.cols;
                 const isCorrect = tileIdx === pos;
                 return (
                   <div
@@ -226,8 +259,7 @@ export default function PuzzleGame() {
                     }}
                     data-pos={pos}
                     style={{
-                      width: pieceSize,
-                      height: pieceSize,
+                      width: pieceSize, height: pieceSize,
                       backgroundImage: `url('${selected.src}')`,
                       backgroundSize: `${totalPx}px ${totalPx}px`,
                       backgroundPosition: `-${col * pieceSize}px -${row * pieceSize}px`,
@@ -241,31 +273,20 @@ export default function PuzzleGame() {
                 );
               })}
             </div>
-
-            {/* Hint overlay */}
             <AnimatePresence>
               {showHint && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.7 }}
-                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0 }} animate={{ opacity: 0.7 }} exit={{ opacity: 0 }}
                   className="absolute inset-0 rounded-2xl pointer-events-none"
-                  style={{
-                    backgroundImage: `url('${selected.src}')`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                  }}
+                  style={{ backgroundImage: `url('${selected.src}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                 />
               )}
             </AnimatePresence>
           </div>
 
-          {/* Hint button */}
           <button
-            onMouseDown={() => setShowHint(true)}
-            onMouseUp={() => setShowHint(false)}
-            onTouchStart={() => setShowHint(true)}
-            onTouchEnd={() => setShowHint(false)}
+            onMouseDown={() => setShowHint(true)} onMouseUp={() => setShowHint(false)}
+            onTouchStart={() => setShowHint(true)} onTouchEnd={() => setShowHint(false)}
             className="font-fredoka text-sm bg-white/80 rounded-2xl px-4 py-2 shadow hover:bg-white transition-all"
           >
             💡 按住看提示
@@ -276,24 +297,13 @@ export default function PuzzleGame() {
       {/* WIN */}
       <AnimatePresence>
         {phase === 'win' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
             <motion.div
-              initial={{ scale: 0.4, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
+              initial={{ scale: 0.4, rotate: -10 }} animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 200 }}
               className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl"
             >
-              <motion.div
-                animate={{ rotate: [0, -10, 10, 0] }}
-                transition={{ duration: 0.6 }}
-                className="text-6xl mb-3"
-              >
-                🏆
-              </motion.div>
+              <motion.div animate={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 0.6 }} className="text-6xl mb-3">🏆</motion.div>
               <h2 className="font-fredoka text-2xl font-bold text-foreground mb-1">太厲害了！</h2>
               <p className="font-fredoka text-muted-foreground mb-4">你完成了《{selected?.label}》！🎉</p>
               <div className="flex gap-3 justify-center mb-6">
@@ -307,16 +317,8 @@ export default function PuzzleGame() {
                 </div>
               </div>
               <div className="flex gap-3">
-                <Button onClick={() => setPhase('home')} variant="outline" className="flex-1 rounded-2xl font-fredoka">
-                  🏠 選其他圖
-                </Button>
-                <Button
-                  onClick={() => startGame(selected)}
-                  className="flex-1 rounded-2xl font-fredoka text-white"
-                  style={{ background: 'linear-gradient(135deg, #F3A8A8, #E8C1F4)' }}
-                >
-                  🔄 再玩
-                </Button>
+                <Button onClick={() => setPhase('home')} variant="outline" className="flex-1 rounded-2xl font-fredoka">🏠 選其他圖</Button>
+                <Button onClick={() => startGame(selected, difficulty)} className="flex-1 rounded-2xl font-fredoka text-white" style={{ background: 'linear-gradient(135deg, #F3A8A8, #E8C1F4)' }}>🔄 再玩</Button>
               </div>
             </motion.div>
           </motion.div>

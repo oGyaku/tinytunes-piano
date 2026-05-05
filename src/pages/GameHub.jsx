@@ -33,14 +33,14 @@ const GAMES = [
     deco: ['💎','🌊','⭐'],
   },
   {
-    to: '/klotski',
-    emoji: '🏯',
-    title: '華容道',
-    desc: '移動方塊，幫曹操逃出包圍！',
+    to: '/spotit',
+    emoji: '🔍',
+    title: 'Spot It!',
+    desc: '誰先找到相同圖案，誰就贏！',
     bg: 'linear-gradient(135deg, #F8E8C0 0%, #F0D8A8 50%, #E8C890 100%)',
     border: '#D4A840',
     accent: '#805010',
-    deco: ['👑','🗡️','🔮'],
+    deco: ['👁️','⭐','🎯'],
   },
 ];
 
