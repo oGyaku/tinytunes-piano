@@ -7,188 +7,179 @@ const GAMES = [
     emoji: '🎹',
     title: '演奏',
     desc: '彈琴學歌曲',
-    bg: 'linear-gradient(135deg, #1a6fa8 0%, #2196c4 60%, #26aec0 100%)',
-    glow: 'rgba(33,150,196,0.45)',
-    deco: ['🐳','🎵','🐬'],
+    accent: '#FFD93D',
+    cardBg: '#2D1B69',
+    deco: '🐳',
   },
   {
     to: '/coloring',
     emoji: '🎨',
     title: '畫畫',
     desc: '塗上美麗顏色',
-    bg: 'linear-gradient(135deg, #0e8c7a 0%, #18b89a 60%, #26d4b0 100%)',
-    glow: 'rgba(24,184,154,0.45)',
-    deco: ['🐙','🖌️','🦑'],
+    accent: '#FF6B6B',
+    cardBg: '#1A3A5C',
+    deco: '🐙',
   },
   {
     to: '/puzzle',
     emoji: '🧩',
     title: '拼圖',
     desc: '完成美麗圖案',
-    bg: 'linear-gradient(135deg, #1456a8 0%, #2272cc 60%, #3a9ce0 100%)',
-    glow: 'rgba(34,114,204,0.45)',
-    deco: ['🐠','💎','🐡'],
+    accent: '#4ECDC4',
+    cardBg: '#2D1B69',
+    deco: '🐠',
   },
   {
     to: '/spotit',
     emoji: '🔍',
     title: '尋找',
     desc: '找出相同圖案',
-    bg: 'linear-gradient(135deg, #5e3fa0 0%, #7b5cbf 60%, #9a7cd8 100%)',
-    glow: 'rgba(123,92,191,0.45)',
-    deco: ['🪸','🔮','🦀'],
+    accent: '#FFD93D',
+    cardBg: '#1A2A5E',
+    deco: '🪼',
   },
 ];
 
-// Floating ocean-sky creatures in the background
-const BG_DECO = [
-  { e:'🐋', x:8,  y:12, s:40 },
-  { e:'🫧', x:22, y:5,  s:22 },
-  { e:'🐬', x:38, y:18, s:32 },
-  { e:'🐠', x:55, y:8,  s:24 },
-  { e:'🦋', x:70, y:20, s:28 },
-  { e:'🐙', x:85, y:10, s:34 },
-  { e:'🫧', x:92, y:35, s:18 },
-  { e:'🐡', x:15, y:55, s:26 },
-  { e:'🦑', x:48, y:72, s:30 },
-  { e:'🪸', x:75, y:65, s:28 },
-  { e:'🦀', x:30, y:80, s:24 },
-  { e:'🐚', x:62, y:88, s:22 },
-  { e:'⭐', x:5,  y:40, s:18 },
-  { e:'💫', x:95, y:60, s:20 },
-];
+// Stars scattered in background
+const STARS = Array.from({ length: 28 }, (_, i) => ({
+  x: (i * 37 + 11) % 100,
+  y: (i * 53 + 7)  % 100,
+  r: i % 3 === 0 ? 3 : i % 3 === 1 ? 2 : 1.5,
+  delay: (i * 0.18) % 2.4,
+}));
 
 export default function GameHub() {
   return (
     <div
-      className="min-h-screen relative overflow-hidden flex flex-col items-center p-4 pb-10"
-      style={{
-        background: 'linear-gradient(180deg, #0d3d6e 0%, #0e5a94 18%, #1278b8 38%, #28a8d8 58%, #4dd4e8 78%, #a0eeee 100%)',
-      }}
+      className="min-h-screen relative overflow-hidden flex flex-col items-center"
+      style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}
     >
-      {/* Cloud layers */}
+      {/* ── Blob shapes (reference style) ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Big background clouds */}
-        {[
-          { w:220, h:80, x:'5%',  y:'15%', op:0.18 },
-          { w:300, h:100,x:'55%', y:'8%',  op:0.14 },
-          { w:180, h:70, x:'75%', y:'30%', op:0.16 },
-          { w:250, h:90, x:'20%', y:'60%', op:0.12 },
-          { w:200, h:75, x:'60%', y:'70%', op:0.15 },
-          { w:150, h:60, x:'10%', y:'82%', op:0.13 },
-        ].map((c,i) => (
+        <div className="absolute rounded-full"
+          style={{ width: 320, height: 320, top: '-80px', right: '-60px',
+            background: 'rgba(255,217,61,0.08)', filter: 'blur(60px)' }} />
+        <div className="absolute rounded-full"
+          style={{ width: 280, height: 280, bottom: '-60px', left: '-40px',
+            background: 'rgba(78,205,196,0.09)', filter: 'blur(50px)' }} />
+        <div className="absolute rounded-full"
+          style={{ width: 200, height: 200, top: '40%', left: '60%',
+            background: 'rgba(120,80,220,0.12)', filter: 'blur(40px)' }} />
+      </div>
+
+      {/* ── Stars ── */}
+      <div className="fixed inset-0 pointer-events-none">
+        {STARS.map((s, i) => (
           <motion.div
             key={i}
-            className="absolute rounded-full"
-            style={{
-              width: c.w, height: c.h,
-              left: c.x, top: c.y,
-              background: 'rgba(255,255,255,0.9)',
-              opacity: c.op,
-              filter: 'blur(8px)',
-            }}
-            animate={{ x: [0, 18, 0], y: [0, -6, 0] }}
-            transition={{ duration: 12 + i * 2, repeat: Infinity, ease: 'easeInOut', delay: i * 1.5 }}
+            className="absolute rounded-full bg-white"
+            style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.r, height: s.r }}
+            animate={{ opacity: [0.2, 0.9, 0.2] }}
+            transition={{ duration: 2 + s.delay, repeat: Infinity, delay: s.delay }}
           />
         ))}
-
-        {/* Floating sea creatures */}
-        {BG_DECO.map((item, i) => (
-          <motion.div
-            key={i}
-            className="absolute select-none"
-            style={{ left: `${item.x}%`, top: `${item.y}%`, fontSize: item.s, opacity: 0.28 }}
-            animate={{ y: [0, -14, 0], rotate: [0, 6, -6, 0], opacity: [0.22, 0.38, 0.22] }}
-            transition={{ duration: 4 + i * 0.4, repeat: Infinity, delay: i * 0.3 }}
-          >
-            {item.e}
-          </motion.div>
+        {/* ✦ sparkles */}
+        {[
+          { x: '12%', y: '22%', s: 14 },
+          { x: '82%', y: '15%', s: 18 },
+          { x: '6%',  y: '58%', s: 12 },
+          { x: '90%', y: '65%', s: 14 },
+          { x: '50%', y: '88%', s: 16 },
+        ].map((sp, i) => (
+          <motion.span key={i} className="absolute select-none"
+            style={{ left: sp.x, top: sp.y, fontSize: sp.s, color: '#FFD93D', opacity: 0.7 }}
+            animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 1.8, delay: i * 0.4, repeat: Infinity }}
+          >✦</motion.span>
         ))}
       </div>
 
-      <div className="relative z-10 w-full max-w-lg flex flex-col items-center gap-6 pt-4">
+      <div className="relative z-10 w-full max-w-sm px-5 flex flex-col items-center pt-12 pb-10 gap-8">
 
-        {/* Hero header */}
+        {/* ── Hero ── */}
         <motion.div
-          initial={{ y: -50, opacity: 0 }}
+          initial={{ y: -40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 90 }}
-          className="text-center"
+          transition={{ type: 'spring', stiffness: 80 }}
+          className="w-full text-left"
         >
+          {/* Big floating creature */}
           <motion.div
-            animate={{ y: [0, -10, 0] }}
+            animate={{ y: [0, -14, 0] }}
             transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="text-7xl md:text-8xl mb-3 inline-block"
+            className="text-8xl mb-4 inline-block"
           >
             🐋
           </motion.div>
-          <h1
-            className="font-fredoka text-4xl md:text-5xl font-bold tracking-wide drop-shadow-lg"
-            style={{ color: '#ffffff', textShadow: '0 2px 20px rgba(0,100,180,0.6), 0 4px 40px rgba(0,60,120,0.4)' }}
-          >
-            海洋天空
+
+          <h1 className="font-fredoka font-bold leading-tight"
+            style={{ fontSize: 42, color: '#ffffff', lineHeight: 1.1 }}>
+            海洋<br />天空
           </h1>
-          <motion.p
-            className="font-fredoka text-base mt-1 text-white/80"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            🫧 海洋生物的雲上樂園 🫧
-          </motion.p>
+          <p className="font-fredoka mt-2" style={{ color: 'rgba(255,255,255,0.55)', fontSize: 15 }}>
+            海洋生物的雲上樂園
+          </p>
+
+          {/* Yellow accent line (reference style) */}
+          <div className="mt-3 rounded-full" style={{ width: 48, height: 4, background: '#FFD93D' }} />
         </motion.div>
 
-        {/* Game cards — 2×2 grid */}
-        <div className="grid grid-cols-2 gap-4 w-full">
+        {/* ── Game cards ── */}
+        <div className="w-full flex flex-col gap-3">
           {GAMES.map((game, i) => (
             <motion.div
               key={game.to}
-              initial={{ scale: 0.75, opacity: 0, y: 40 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 + i * 0.1, type: 'spring', stiffness: 160 }}
+              initial={{ x: -60, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.1 + i * 0.08, type: 'spring', stiffness: 140 }}
             >
               <Link to={game.to}>
                 <motion.div
-                  whileHover={{ scale: 1.06, y: -5, boxShadow: `0 16px 48px ${game.glow}` }}
-                  whileTap={{ scale: 0.96 }}
-                  className="relative overflow-hidden rounded-3xl p-5 cursor-pointer select-none"
+                  whileHover={{ scale: 1.025, x: 6 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="relative flex items-center gap-4 overflow-hidden cursor-pointer select-none"
                   style={{
-                    background: game.bg,
-                    boxShadow: `0 6px 24px ${game.glow}`,
-                    border: '1.5px solid rgba(255,255,255,0.22)',
+                    background: 'rgba(255,255,255,0.07)',
+                    border: '1.5px solid rgba(255,255,255,0.12)',
+                    borderRadius: 20,
+                    padding: '14px 18px',
+                    backdropFilter: 'blur(12px)',
                   }}
                 >
-                  {/* Shimmer bubble top-right */}
-                  <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full"
-                    style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(2px)' }}
-                  />
+                  {/* Accent left bar */}
+                  <div className="absolute left-0 top-0 bottom-0 rounded-l-[18px]"
+                    style={{ width: 4, background: game.accent }} />
 
-                  {/* Main emoji */}
-                  <motion.div
-                    className="text-4xl mb-2 inline-block"
+                  {/* Emoji badge */}
+                  <div className="flex-shrink-0 flex items-center justify-center rounded-2xl"
+                    style={{ width: 52, height: 52, background: game.accent + '22', border: `1.5px solid ${game.accent}55` }}>
+                    <span style={{ fontSize: 26 }}>{game.emoji}</span>
+                  </div>
+
+                  {/* Text */}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-fredoka font-bold text-white" style={{ fontSize: 20 }}>
+                      {game.title}
+                    </div>
+                    <div className="font-fredoka" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
+                      {game.desc}
+                    </div>
+                  </div>
+
+                  {/* Deco creature */}
+                  <motion.span
+                    className="flex-shrink-0"
+                    style={{ fontSize: 30, opacity: 0.55 }}
                     animate={{ y: [0, -5, 0] }}
-                    transition={{ duration: 2.2, repeat: Infinity, delay: i * 0.5 }}
+                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
                   >
-                    {game.emoji}
-                  </motion.div>
+                    {game.deco}
+                  </motion.span>
 
-                  <h2 className="font-fredoka text-xl font-bold text-white drop-shadow mb-0.5">
-                    {game.title}
-                  </h2>
-                  <p className="font-fredoka text-sm text-white/75">{game.desc}</p>
-
-                  {/* Deco row */}
-                  <div className="flex gap-1.5 mt-3">
-                    {game.deco.map((d, j) => (
-                      <motion.span
-                        key={j}
-                        className="text-base"
-                        animate={{ opacity: [0.5, 1, 0.5], y: [0, -3, 0] }}
-                        transition={{ duration: 1.8, repeat: Infinity, delay: j * 0.3 }}
-                      >
-                        {d}
-                      </motion.span>
-                    ))}
+                  {/* Arrow */}
+                  <div className="flex-shrink-0 flex items-center justify-center rounded-full"
+                    style={{ width: 28, height: 28, background: game.accent, marginLeft: 4 }}>
+                    <span style={{ fontSize: 13, color: '#1a0b40', fontWeight: 'bold' }}>›</span>
                   </div>
                 </motion.div>
               </Link>
@@ -196,19 +187,33 @@ export default function GameHub() {
           ))}
         </div>
 
-        {/* Bottom sea creatures */}
+        {/* ── Bottom CTA (reference style white pill button) ── */}
         <motion.div
-          className="flex gap-4 text-3xl mt-1"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.6 }}
+          className="w-full"
         >
-          {['🐠','🐬','🐙','🦀','🐡','🦋'].map((e, i) => (
-            <motion.span
-              key={i}
-              animate={{ y: [0, -10, 0], rotate: [0, 8, -8, 0] }}
-              transition={{ duration: 1.8, delay: i * 0.2, repeat: Infinity }}
-            >
+          <div
+            className="w-full rounded-3xl py-4 text-center"
+            style={{ background: 'rgba(255,255,255,0.95)', boxShadow: '0 8px 32px rgba(0,0,0,0.25)' }}
+          >
+            <div className="font-fredoka font-bold" style={{ fontSize: 17, color: '#2d1b6e' }}>
+              開始探索！
+            </div>
+            <div className="font-fredoka mt-0.5" style={{ fontSize: 13, color: '#9080c0' }}>
+              選個遊戲，出發吧 🚀
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Bottom creatures */}
+        <motion.div className="flex gap-5 text-2xl"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}>
+          {['🐠','🐬','🐙','🦀','🐡'].map((e, i) => (
+            <motion.span key={i}
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 1.8, delay: i * 0.18, repeat: Infinity }}>
               {e}
             </motion.span>
           ))}
