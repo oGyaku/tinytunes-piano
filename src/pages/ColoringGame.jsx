@@ -174,17 +174,17 @@ export default function ColoringGame() {
 
   return (
     <div className="min-h-screen flex flex-col select-none"
-      style={{ background: 'linear-gradient(135deg, #FFF0F5 0%, #FFF9E6 50%, #F0FFFE 100%)' }}
+      style={{ background: 'linear-gradient(180deg, #0d3d6e 0%, #0e5a94 25%, #1278b8 60%, #28a8d8 100%)' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3 pb-1 shrink-0">
         <Link to="/">
-          <Button variant="ghost" size="icon" className="rounded-full bg-white/80 shadow w-9 h-9">
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
+          <button className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)' }}>
+            <ArrowLeft className="w-4 h-4 text-white" />
+          </button>
         </Link>
-        <h1 className="font-fredoka text-lg font-bold" style={{ color: '#C05070' }}>
-          🎨 台灣塗鴉樂園
+        <h1 className="font-fredoka text-lg font-bold text-white drop-shadow">
+          🎨 畫畫
         </h1>
         <div className="w-9" />
       </div>

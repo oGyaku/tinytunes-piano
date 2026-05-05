@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -6,61 +7,57 @@
 
 @layer base {
   :root {
-    /* Pastel fairy-tale palette */
-    --background: 340 60% 97%;
-    --foreground: 320 40% 25%;
+    /* Ocean-sky palette */
+    --background: 205 85% 96%;
+    --foreground: 215 50% 20%;
     --card: 0 0% 100%;
-    --card-foreground: 320 40% 25%;
+    --card-foreground: 215 50% 20%;
     --popover: 0 0% 100%;
-    --popover-foreground: 320 40% 25%;
-    --primary: 340 70% 72%;
+    --popover-foreground: 215 50% 20%;
+    --primary: 200 80% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 45 80% 80%;
-    --secondary-foreground: 320 40% 25%;
-    --muted: 340 30% 94%;
-    --muted-foreground: 320 20% 55%;
-    --accent: 170 50% 72%;
+    --secondary: 175 65% 62%;
+    --secondary-foreground: 215 50% 20%;
+    --muted: 205 40% 92%;
+    --muted-foreground: 210 25% 50%;
+    --accent: 185 70% 65%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 70% 65%;
     --destructive-foreground: 0 0% 98%;
-    --border: 340 30% 88%;
-    --input: 340 30% 88%;
-    --ring: 340 70% 72%;
-    --chart-1: 340 70% 72%;
-    --chart-2: 45 80% 70%;
-    --chart-3: 200 60% 72%;
-    --chart-4: 270 50% 75%;
-    --chart-5: 120 40% 70%;
+    --border: 205 40% 82%;
+    --input: 205 40% 82%;
+    --ring: 200 80% 52%;
+    --chart-1: 200 80% 52%;
+    --chart-2: 175 65% 55%;
+    --chart-3: 220 60% 60%;
+    --chart-4: 270 50% 65%;
+    --chart-5: 160 50% 60%;
     --radius: 1rem;
 
     --font-fredoka: 'Fredoka', sans-serif;
+    --font-nunito: 'Nunito', sans-serif;
   }
 
   .dark {
-    --background: 320 30% 10%;
-    --foreground: 340 60% 95%;
-    --card: 320 25% 14%;
-    --card-foreground: 340 60% 95%;
-    --popover: 320 25% 14%;
-    --popover-foreground: 340 60% 95%;
-    --primary: 340 65% 70%;
+    --background: 215 45% 10%;
+    --foreground: 205 80% 92%;
+    --card: 215 40% 14%;
+    --card-foreground: 205 80% 92%;
+    --popover: 215 40% 14%;
+    --popover-foreground: 205 80% 92%;
+    --primary: 200 75% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 45 70% 65%;
-    --secondary-foreground: 320 40% 15%;
-    --muted: 320 20% 20%;
-    --muted-foreground: 340 30% 65%;
-    --accent: 170 45% 60%;
+    --secondary: 175 55% 50%;
+    --secondary-foreground: 215 50% 15%;
+    --muted: 215 30% 20%;
+    --muted-foreground: 205 40% 60%;
+    --accent: 185 60% 55%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 40%;
     --destructive-foreground: 0 0% 98%;
-    --border: 320 20% 25%;
-    --input: 320 20% 25%;
-    --ring: 340 65% 70%;
-    --chart-1: 340 65% 70%;
-    --chart-2: 45 70% 65%;
-    --chart-3: 200 55% 65%;
-    --chart-4: 270 45% 70%;
-    --chart-5: 120 35% 60%;
+    --border: 215 30% 25%;
+    --input: 215 30% 25%;
+    --ring: 200 75% 55%;
   }
 }
 

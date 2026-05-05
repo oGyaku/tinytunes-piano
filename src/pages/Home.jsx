@@ -22,7 +22,7 @@ const modes = [
 export default function Home() {
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg, #FFF0F5 0%, #FFF9E6 50%, #F0FFFE 100%)' }}
+      style={{ background: 'linear-gradient(180deg, #0d3d6e 0%, #0e5a94 25%, #1278b8 55%, #28a8d8 80%, #4dd4e8 100%)' }}
     >
       <BackgroundBubbles />
       <div className="absolute top-4 left-4 z-20">
@@ -48,10 +48,10 @@ export default function Home() {
           >
             🎹
           </motion.div>
-          <h1 className="font-fredoka text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#FF4B4B] via-[#FFD93D] to-[#4D96FF] bg-clip-text text-transparent">
-            Piano Kids
+          <h1 className="font-fredoka text-4xl md:text-5xl font-bold text-white drop-shadow-lg">
+            演奏
           </h1>
-          <p className="font-fredoka text-muted-foreground mt-2 text-lg">
+          <p className="font-fredoka text-white/75 mt-2 text-lg">
             音樂與歌曲 🎶
           </p>
         </motion.div>
@@ -97,7 +97,7 @@ export default function Home() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          {['🐻', '🐰', '🦊', '🐸', '🐱'].map((emoji, i) => (
+          {['🐠', '🐬', '🐙', '🦀', '🐡'].map((emoji, i) => (
             <motion.span
               key={i}
               animate={{ y: [0, -8, 0] }}

@@ -118,15 +118,15 @@ export default function PuzzleGame() {
   const allImages = uploadedImg ? [uploadedImg, ...BUILTIN] : BUILTIN;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #D4EEFF 0%, #C8F0E8 100%)' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #0d3d6e 0%, #0e5a94 25%, #1278b8 55%, #28a8d8 80%, #4dd4e8 100%)' }}>
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <Link to="/">
-          <Button variant="ghost" size="icon" className="rounded-full bg-white/80 shadow-md w-10 h-10">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
+          <button className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)' }}>
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </button>
         </Link>
-        <h1 className="font-fredoka text-xl font-bold" style={{ color: '#5B9EC9' }}>🧩 拼圖挑戰</h1>
+        <h1 className="font-fredoka text-xl font-bold text-white drop-shadow">🧩 拼圖</h1>
         <div className="w-10" />
       </div>
 
@@ -135,26 +135,27 @@ export default function PuzzleGame() {
         <div className="flex-1 px-4 pb-8 flex flex-col gap-6 max-w-2xl mx-auto w-full">
 
           {/* Upload section */}
-          <div className="bg-white/70 rounded-3xl p-4 shadow-md">
-            <h2 className="font-fredoka text-base font-bold mb-3" style={{ color: '#5B9EC9' }}>📤 上傳自己的圖片</h2>
+          <div className="rounded-3xl p-4 shadow-md" style={{ background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)' }}>
+            <h2 className="font-fredoka text-base font-bold mb-3 text-white">📤 上傳圖片</h2>
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-blue-300 rounded-2xl p-4 cursor-pointer flex items-center gap-4 hover:bg-blue-50/50 transition-all"
+              className="border-2 border-dashed rounded-2xl p-4 cursor-pointer flex items-center gap-4 transition-all"
+              style={{ borderColor: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.08)' }}
             >
               {uploadedImg ? (
                 <>
                   <img src={uploadedImg.src} className="w-16 h-16 rounded-xl object-cover shadow" alt="uploaded" />
                   <div>
-                    <div className="font-fredoka font-semibold text-sm text-green-600">✅ 圖片已上傳！</div>
-                    <div className="font-fredoka text-xs text-muted-foreground mt-0.5">點擊可重新上傳</div>
+                    <div className="font-fredoka font-semibold text-sm text-green-300">✅ 圖片已上傳！</div>
+                    <div className="font-fredoka text-xs text-white/60 mt-0.5">點擊可重新上傳</div>
                   </div>
                 </>
               ) : (
                 <>
                   <span className="text-4xl">📁</span>
                   <div>
-                    <div className="font-fredoka font-semibold text-sm text-blue-500">點擊上傳圖片</div>
-                    <div className="font-fredoka text-xs text-muted-foreground mt-0.5">系統自動裁切正中心正方形</div>
+                    <div className="font-fredoka font-semibold text-sm text-white/90">點擊上傳圖片</div>
+                    <div className="font-fredoka text-xs text-white/60 mt-0.5">自動裁切正中心正方形</div>
                   </div>
                 </>
               )}
@@ -163,8 +164,8 @@ export default function PuzzleGame() {
           </div>
 
           {/* Difficulty section */}
-          <div className="bg-white/70 rounded-3xl p-4 shadow-md">
-            <h2 className="font-fredoka text-base font-bold mb-3" style={{ color: '#5B9EC9' }}>🎯 選擇難度</h2>
+          <div className="rounded-3xl p-4 shadow-md" style={{ background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)' }}>
+            <h2 className="font-fredoka text-base font-bold mb-3 text-white">🎯 難度</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {DIFFICULTIES.map(d => (
                 <button
@@ -172,9 +173,13 @@ export default function PuzzleGame() {
                   onClick={() => setDifficulty(d)}
                   className={`rounded-2xl p-3 font-fredoka text-sm font-semibold transition-all border-2 ${
                     difficulty.key === d.key
-                      ? 'border-blue-400 bg-blue-100 text-blue-700 shadow-md scale-105'
-                      : 'border-transparent bg-white/60 text-foreground hover:bg-white'
+                      ? 'scale-105'
+                      : ''
                   }`}
+                  style={difficulty.key === d.key
+                    ? { background: 'rgba(255,255,255,0.95)', color: '#1278b8', borderColor: 'rgba(255,255,255,0.9)' }
+                    : { background: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.85)', borderColor: 'rgba(255,255,255,0.2)' }
+                  }
                 >
                   <div>{d.label}</div>
                   <div className="text-xs font-normal opacity-70 mt-0.5">{d.desc}</div>
@@ -185,7 +190,7 @@ export default function PuzzleGame() {
 
           {/* Image grid */}
           <div>
-            <h2 className="font-fredoka text-base font-bold mb-3 px-1" style={{ color: '#5B9EC9' }}>🖼️ 選擇圖片</h2>
+            <h2 className="font-fredoka text-base font-bold mb-3 px-1 text-white">🖼️ 選圖片</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {allImages.map((item, i) => (
                 <motion.div
