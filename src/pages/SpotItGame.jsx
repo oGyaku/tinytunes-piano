@@ -154,11 +154,14 @@ export default function SpotItGame() {
         if (nextIdx >= deckOrder.length) {
           setPhase('win');
         } else {
-          // Old playerCard becomes new topCard — keep its seed stable
-          setTopCard(playerCard);
-          setTopSeed(s => s); // same seed = same order
-          setPlayerCard(DECK[deckOrder[nextIdx]]);
-          setPlayerSeed(Math.random()); // new seed = new shuffle for new card
+          const newTop = playerCard;
+          const newTopSeedVal = playerSeed; // carry over player's seed so layout stays same
+          const newPlayer = DECK[deckOrder[nextIdx]];
+          const newPlayerSeedVal = Math.random();
+          setTopCard(newTop);
+          setTopSeed(newTopSeedVal);
+          setPlayerCard(newPlayer);
+          setPlayerSeed(newPlayerSeedVal);
           setDeckIdx(nextIdx);
         }
       }, 700);

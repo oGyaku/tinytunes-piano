@@ -8,21 +8,21 @@ const modes = [
     emoji: '🎹',
     title: '自由彈奏',
     desc: '用彩色琴鍵創作音樂',
-    gradient: 'from-[#F3A8A8] to-[#FCC190]',
+    accent: '#FFD93D',
   },
   {
     to: '/song-mode',
     emoji: '🎵',
     title: '歌曲跟彈',
     desc: '跟隨提示學習經典歌曲',
-    gradient: 'from-[#9FC2DD] to-[#E8C1F4]',
+    accent: '#4ECDC4',
   },
 ];
 
 export default function Home() {
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4"
-      style={{ background: 'linear-gradient(180deg, #0d3d6e 0%, #0e5a94 25%, #1278b8 55%, #28a8d8 80%, #4dd4e8 100%)' }}
+      style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}
     >
       <BackgroundBubbles />
       <div className="absolute top-4 left-4 z-20">
@@ -67,22 +67,30 @@ export default function Home() {
             >
               <Link to={mode.to}>
                 <motion.div
-                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileHover={{ scale: 1.025, x: 6 }}
                   whileTap={{ scale: 0.97 }}
-                  className={`
-                    bg-gradient-to-r ${mode.gradient} rounded-3xl p-6 md:p-8
-                    shadow-xl cursor-pointer select-none
-                    flex items-center gap-5
-                  `}
+                  className="relative flex items-center gap-4 overflow-hidden cursor-pointer select-none"
+                  style={{
+                    background: 'rgba(255,255,255,0.07)',
+                    border: '1.5px solid rgba(255,255,255,0.12)',
+                    borderRadius: 20,
+                    padding: '16px 20px',
+                    backdropFilter: 'blur(12px)',
+                  }}
                 >
-                  <span className="text-5xl md:text-6xl">{mode.emoji}</span>
-                  <div>
-                    <h2 className="font-fredoka text-2xl md:text-3xl font-bold text-white">
-                      {mode.title}
-                    </h2>
-                    <p className="font-fredoka text-white/80 text-sm md:text-base mt-1">
-                      {mode.desc}
-                    </p>
+                  <div className="absolute left-0 top-0 bottom-0 rounded-l-[18px]"
+                    style={{ width: 4, background: mode.accent }} />
+                  <div className="flex-shrink-0 flex items-center justify-center rounded-2xl"
+                    style={{ width: 56, height: 56, background: mode.accent + '22', border: `1.5px solid ${mode.accent}55` }}>
+                    <span className="text-4xl">{mode.emoji}</span>
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="font-fredoka text-xl font-bold text-white">{mode.title}</h2>
+                    <p className="font-fredoka text-white/55 text-sm mt-0.5">{mode.desc}</p>
+                  </div>
+                  <div className="flex-shrink-0 flex items-center justify-center rounded-full"
+                    style={{ width: 28, height: 28, background: mode.accent }}>
+                    <span style={{ fontSize: 14, color: '#1a0b40', fontWeight: 'bold' }}>›</span>
                   </div>
                 </motion.div>
               </Link>

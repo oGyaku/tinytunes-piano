@@ -155,26 +155,30 @@ export default function ColoringGame() {
     drawRef.current.getContext('2d').clearRect(0, 0, drawRef.current.width, drawRef.current.height);
   };
 
+  const panelStyle = {
+    background: 'rgba(255,255,255,0.08)',
+    border: '1px solid rgba(255,255,255,0.15)',
+    borderRadius: 16,
+  };
+
   return (
-    <div className="min-h-screen flex flex-col select-none"
+    <div className="min-h-screen flex flex-col select-none overflow-y-auto"
       style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-1 shrink-0">
+      <div className="flex items-center justify-between px-4 pt-3 pb-2 shrink-0">
         <Link to="/">
           <button className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)' }}>
             <ArrowLeft className="w-4 h-4 text-white" />
           </button>
         </Link>
-        <h1 className="font-fredoka text-lg font-bold text-white drop-shadow">
-          🎨 畫畫
-        </h1>
+        <h1 className="font-fredoka text-lg font-bold text-white drop-shadow">🎨 畫畫</h1>
         <div className="w-9" />
       </div>
 
-      {/* Scene strip */}
-      <div className="px-3 pb-1 shrink-0">
-        <div className="flex gap-1.5 overflow-x-auto pb-1">
+      {/* Scene strip — always horizontal scroll, no wrapping */}
+      <div className="px-3 pb-2 shrink-0">
+        <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
           {BUILTIN_SCENES.map(scene => (
             <motion.button
               key={scene.id}
@@ -193,79 +197,59 @@ export default function ColoringGame() {
         </div>
       </div>
 
-      {/* MAIN LAYOUT */}
-      <div className="flex-1 flex flex-col md:flex-row gap-2 px-2 pb-3 min-h-0">
+      {/* DESKTOP LAYOUT: side-by-side */}
+      <div className="hidden md:flex flex-1 gap-2 px-2 pb-3 min-h-0">
 
-        {/* Color / Tool sidebar */}
-        <div className="rounded-2xl shadow p-2 shrink-0 md:w-28 overflow-x-auto md:overflow-visible"
-          style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}>
-          <div className="flex md:flex-col gap-3 md:gap-2 min-w-max md:min-w-0">
-            {/* Colors */}
-            <div className="shrink-0">
-              <div className="font-fredoka text-[10px] text-white/50 text-center mb-1">🎨 顏色</div>
-              <div className="flex flex-wrap gap-1" style={{ maxWidth: 240 }}>
-                {COLORS.map(c => (
-                  <button
-                    key={c}
-                    onClick={() => { setCurrentColor(c); setTool('brush'); }}
-                    className="rounded-full transition-all hover:scale-110 shrink-0"
-                    style={{
-                      background: c, width: 22, height: 22,
-                      border: currentColor === c ? '3px solid #FFD93D' : '2px solid rgba(255,255,255,0.2)',
-                      transform: currentColor === c ? 'scale(1.25)' : '',
-                      outline: c === '#FFFFFF' ? '1px solid rgba(255,255,255,0.4)' : 'none',
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="md:hidden w-px self-stretch mx-1 shrink-0" style={{ background: 'rgba(255,255,255,0.15)' }} />
-            <div className="hidden md:block h-px w-full" style={{ background: 'rgba(255,255,255,0.1)' }} />
-
-            {/* Brush + tools */}
-            <div className="flex md:flex-col gap-2 items-start shrink-0">
-              <div>
-                <div className="font-fredoka text-[10px] text-white/50 text-center mb-1">🖌️ 筆</div>
-                <div className="flex md:flex-col gap-1 items-center">
-                  {BRUSH_SIZES.map(s => (
-                    <button key={s}
-                      onClick={() => setBrushSize(s)}
-                      className="flex items-center justify-center rounded-full border-2 transition-all shrink-0"
-                      style={{
-                        width: 26 + s, height: 26 + s,
-                        borderColor: brushSize === s ? '#FFD93D' : 'rgba(255,255,255,0.15)',
-                        background: brushSize === s ? 'rgba(255,217,61,0.15)' : 'rgba(255,255,255,0.08)',
-                      }}
-                    >
-                      <div className="rounded-full bg-white" style={{ width: s * 0.5 + 2, height: s * 0.5 + 2, opacity: 0.8 }} />
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="flex md:flex-col gap-1 shrink-0">
-                {[{ id: 'brush', label: '✏️' }, { id: 'eraser', label: '🧹' }].map(t => (
-                  <button key={t.id} onClick={() => setTool(t.id)}
-                    className="text-lg p-1.5 rounded-xl border-2 transition-all"
-                    style={{
-                      borderColor: tool === t.id ? '#FFD93D' : 'rgba(255,255,255,0.1)',
-                      background: tool === t.id ? 'rgba(255,217,61,0.15)' : 'rgba(255,255,255,0.07)',
-                    }}
-                  >{t.label}</button>
-                ))}
-                <button onClick={undo} className="text-lg p-1.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.1)' }}>↩️</button>
-                <button onClick={clearAll} className="text-lg p-1.5 rounded-xl" style={{ background: 'rgba(220,60,60,0.2)' }}>🗑️</button>
-              </div>
-            </div>
+        {/* Left sidebar: colors + tools */}
+        <div className="shrink-0 w-32 flex flex-col gap-2 overflow-y-auto" style={{ ...panelStyle, padding: 10 }}>
+          <div className="font-fredoka text-[10px] text-white/50 text-center">🎨 顏色</div>
+          <div className="flex flex-wrap gap-1 justify-center">
+            {COLORS.map(c => (
+              <button key={c} onClick={() => { setCurrentColor(c); setTool('brush'); }}
+                className="rounded-full transition-all hover:scale-110 shrink-0"
+                style={{
+                  background: c, width: 20, height: 20,
+                  border: currentColor === c ? '3px solid #FFD93D' : '2px solid rgba(255,255,255,0.2)',
+                  transform: currentColor === c ? 'scale(1.2)' : '',
+                  outline: c === '#FFFFFF' ? '1px solid rgba(255,255,255,0.4)' : 'none',
+                }}
+              />
+            ))}
+          </div>
+          <div className="h-px w-full" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          <div className="font-fredoka text-[10px] text-white/50 text-center">🖌️ 筆刷</div>
+          <div className="flex flex-col gap-1 items-center">
+            {BRUSH_SIZES.map(s => (
+              <button key={s} onClick={() => setBrushSize(s)}
+                className="flex items-center justify-center rounded-full border-2 transition-all"
+                style={{
+                  width: 26 + s, height: 26 + s,
+                  borderColor: brushSize === s ? '#FFD93D' : 'rgba(255,255,255,0.15)',
+                  background: brushSize === s ? 'rgba(255,217,61,0.15)' : 'rgba(255,255,255,0.08)',
+                }}
+              >
+                <div className="rounded-full bg-white" style={{ width: s * 0.5 + 2, height: s * 0.5 + 2, opacity: 0.8 }} />
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-col gap-1 items-center">
+            {[{ id: 'brush', label: '✏️' }, { id: 'eraser', label: '🧹' }].map(t => (
+              <button key={t.id} onClick={() => setTool(t.id)}
+                className="text-lg p-1.5 rounded-xl border-2 transition-all"
+                style={{
+                  borderColor: tool === t.id ? '#FFD93D' : 'rgba(255,255,255,0.1)',
+                  background: tool === t.id ? 'rgba(255,217,61,0.15)' : 'rgba(255,255,255,0.07)',
+                }}>{t.label}</button>
+            ))}
+            <button onClick={undo} className="text-lg p-1.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.1)' }}>↩️</button>
+            <button onClick={clearAll} className="text-lg p-1.5 rounded-xl" style={{ background: 'rgba(220,60,60,0.2)' }}>🗑️</button>
           </div>
         </div>
 
-        {/* Canvas + Stickers */}
-        <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0">
-          {/* Canvas */}
-          <div className="flex-1 rounded-2xl shadow p-1.5 flex items-center justify-center min-h-0"
-            style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)' }}>
-            <div className="relative w-full" style={{ maxWidth: 560 }}>
+        {/* Center: canvas */}
+        <div className="flex-1 flex flex-col gap-2 min-w-0">
+          <div className="flex-1 rounded-2xl p-1.5 flex items-center justify-center" style={panelStyle}>
+            <div className="relative w-full" style={{ maxWidth: 520 }}>
               <div className="relative rounded-xl overflow-hidden" style={{ border: '2px solid rgba(255,217,61,0.4)', aspectRatio: '1 / 1' }}>
                 <canvas ref={baseRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 1 }} />
                 <canvas ref={drawRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 2 }} />
@@ -279,31 +263,105 @@ export default function ColoringGame() {
             </div>
           </div>
 
-          {/* Stickers — auto-fit columns based on container */}
-          <div className="rounded-2xl shadow px-3 py-2 shrink-0"
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}>
+          {/* Stickers below canvas on desktop */}
+          <div className="shrink-0 rounded-2xl px-3 py-2" style={panelStyle}>
             <div className="font-fredoka text-[10px] text-white/50 mb-1.5 text-center">🎀 印章貼紙</div>
-            <div className="flex flex-wrap gap-0.5 justify-start">
+            <div className="flex flex-wrap gap-1">
               {STICKERS.map(s => (
-                <button
-                  key={s}
-                  onClick={() => { setCurrentSticker(s); setTool('sticker'); }}
+                <button key={s} onClick={() => { setCurrentSticker(s); setTool('sticker'); }}
                   className="flex items-center justify-center rounded-lg transition-all hover:scale-125"
                   style={{
                     width: 32, height: 32, fontSize: 20,
-                    background: tool === 'sticker' && currentSticker === s
-                      ? 'rgba(255,217,61,0.3)'
-                      : 'rgba(255,255,255,0.05)',
-                    border: tool === 'sticker' && currentSticker === s
-                      ? '1.5px solid #FFD93D'
-                      : '1px solid transparent',
-                    transform: tool === 'sticker' && currentSticker === s ? 'scale(1.15)' : '',
+                    background: tool === 'sticker' && currentSticker === s ? 'rgba(255,217,61,0.3)' : 'rgba(255,255,255,0.05)',
+                    border: tool === 'sticker' && currentSticker === s ? '1.5px solid #FFD93D' : '1px solid transparent',
                   }}
-                >
-                  {s}
-                </button>
+                >{s}</button>
               ))}
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MOBILE LAYOUT: stacked vertically, all scrollable */}
+      <div className="flex md:hidden flex-col gap-2 px-2 pb-4">
+
+        {/* Colors + tools in one horizontal row */}
+        <div className="shrink-0 rounded-2xl p-2" style={panelStyle}>
+          {/* Color row */}
+          <div className="font-fredoka text-[10px] text-white/50 text-center mb-1">🎨 顏色</div>
+          <div className="flex flex-wrap gap-1 mb-2">
+            {COLORS.map(c => (
+              <button key={c} onClick={() => { setCurrentColor(c); setTool('brush'); }}
+                className="rounded-full transition-all shrink-0"
+                style={{
+                  background: c, width: 24, height: 24,
+                  border: currentColor === c ? '3px solid #FFD93D' : '2px solid rgba(255,255,255,0.2)',
+                  transform: currentColor === c ? 'scale(1.2)' : '',
+                  outline: c === '#FFFFFF' ? '1px solid rgba(255,255,255,0.4)' : 'none',
+                }}
+              />
+            ))}
+          </div>
+          {/* Tools row */}
+          <div className="flex gap-2 items-center flex-wrap">
+            <div className="font-fredoka text-[10px] text-white/50">🖌️</div>
+            {BRUSH_SIZES.map(s => (
+              <button key={s} onClick={() => setBrushSize(s)}
+                className="flex items-center justify-center rounded-full border-2 transition-all shrink-0"
+                style={{
+                  width: 22 + s, height: 22 + s,
+                  borderColor: brushSize === s ? '#FFD93D' : 'rgba(255,255,255,0.15)',
+                  background: brushSize === s ? 'rgba(255,217,61,0.15)' : 'rgba(255,255,255,0.08)',
+                }}
+              >
+                <div className="rounded-full bg-white" style={{ width: s * 0.45 + 2, height: s * 0.45 + 2, opacity: 0.8 }} />
+              </button>
+            ))}
+            <div className="ml-1 flex gap-1">
+              {[{ id: 'brush', label: '✏️' }, { id: 'eraser', label: '🧹' }].map(t => (
+                <button key={t.id} onClick={() => setTool(t.id)}
+                  className="text-base p-1 rounded-xl border-2 transition-all"
+                  style={{
+                    borderColor: tool === t.id ? '#FFD93D' : 'rgba(255,255,255,0.1)',
+                    background: tool === t.id ? 'rgba(255,217,61,0.15)' : 'rgba(255,255,255,0.07)',
+                  }}>{t.label}</button>
+              ))}
+              <button onClick={undo} className="text-base p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.1)' }}>↩️</button>
+              <button onClick={clearAll} className="text-base p-1 rounded-xl" style={{ background: 'rgba(220,60,60,0.2)' }}>🗑️</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Canvas */}
+        <div className="rounded-2xl p-1.5" style={panelStyle}>
+          <div className="relative w-full">
+            <div className="relative rounded-xl overflow-hidden" style={{ border: '2px solid rgba(255,217,61,0.4)', aspectRatio: '1 / 1' }}>
+              <canvas ref={baseRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 1 }} />
+              <canvas ref={drawRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 2 }} />
+              <canvas ref={imgRef}  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 3, pointerEvents: 'none' }} />
+              <canvas ref={eventRef}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 4, cursor: tool === 'sticker' ? 'cell' : 'crosshair' }}
+                onMouseDown={startDraw} onMouseMove={onDraw} onMouseUp={stopDraw} onMouseLeave={stopDraw}
+                onTouchStart={startDraw} onTouchMove={onDraw} onTouchEnd={stopDraw}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Stickers */}
+        <div className="rounded-2xl px-3 py-2" style={panelStyle}>
+          <div className="font-fredoka text-[10px] text-white/50 mb-1.5 text-center">🎀 印章貼紙</div>
+          <div className="flex flex-wrap gap-1">
+            {STICKERS.map(s => (
+              <button key={s} onClick={() => { setCurrentSticker(s); setTool('sticker'); }}
+                className="flex items-center justify-center rounded-lg transition-all"
+                style={{
+                  width: 36, height: 36, fontSize: 22,
+                  background: tool === 'sticker' && currentSticker === s ? 'rgba(255,217,61,0.3)' : 'rgba(255,255,255,0.05)',
+                  border: tool === 'sticker' && currentSticker === s ? '1.5px solid #FFD93D' : '1px solid transparent',
+                }}
+              >{s}</button>
+            ))}
           </div>
         </div>
       </div>
