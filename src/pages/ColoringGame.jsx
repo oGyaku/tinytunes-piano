@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const BUILTIN_SCENES = [
   { id: 'blank',   emoji: '⬜', name: '空白畫布',    img: null },
@@ -30,7 +29,6 @@ const COLORS = [
   '#111111','#777777','#FFFFFF',
 ];
 
-// 36 stickers in 6 rows of 6 — even grid on all screen sizes
 const STICKERS = [
   '⭐','🌙','☀️','🌈','❄️','⛅',
   '🌸','🌺','🌻','🍀','🌿','🍁',
@@ -43,7 +41,6 @@ const STICKERS = [
 const BRUSH_SIZES = [5, 12, 24];
 
 export default function ColoringGame() {
-  const [scenes, setScenes] = useState(BUILTIN_SCENES);
   const [currentScene, setCurrentScene] = useState(BUILTIN_SCENES[0]);
   const [currentColor, setCurrentColor] = useState('#CC2222');
   const [brushSize, setBrushSize] = useState(12);
@@ -58,7 +55,6 @@ export default function ColoringGame() {
   const lastPos   = useRef({ x: 0, y: 0 });
   const history   = useRef([]);
   const currentSceneRef = useRef(BUILTIN_SCENES[0]);
-  const fileInputRef = useRef(null);
 
   const loadScene = useCallback((scene, w, h) => {
     const bCtx = baseRef.current?.getContext('2d');
@@ -96,19 +92,6 @@ export default function ColoringGame() {
     setCurrentScene(scene);
     currentSceneRef.current = scene;
     resize(scene);
-  };
-
-  const handleUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    const newScene = { id: `upload_${Date.now()}`, emoji: '🖼️', name: '我的圖片', img: url };
-    setScenes(prev => {
-      const filtered = prev.filter(s => !s.id.startsWith('upload_'));
-      return [...filtered, newScene];
-    });
-    handleSelectScene(newScene);
-    e.target.value = '';
   };
 
   const getPos = (e) => {
@@ -174,12 +157,12 @@ export default function ColoringGame() {
 
   return (
     <div className="min-h-screen flex flex-col select-none"
-      style={{ background: 'linear-gradient(180deg, #0d3d6e 0%, #0e5a94 25%, #1278b8 60%, #28a8d8 100%)' }}
+      style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3 pb-1 shrink-0">
         <Link to="/">
-          <button className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)' }}>
+          <button className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)' }}>
             <ArrowLeft className="w-4 h-4 text-white" />
           </button>
         </Link>
@@ -192,52 +175,34 @@ export default function ColoringGame() {
       {/* Scene strip */}
       <div className="px-3 pb-1 shrink-0">
         <div className="flex gap-1.5 overflow-x-auto pb-1">
-          {scenes.map(scene => (
+          {BUILTIN_SCENES.map(scene => (
             <motion.button
               key={scene.id}
               whileTap={{ scale: 0.92 }}
               onClick={() => handleSelectScene(scene)}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-2xl font-fredoka text-[11px] font-semibold shrink-0 transition-all
-                ${currentScene.id === scene.id ? 'text-white shadow-md' : 'bg-white/80 text-foreground'}`}
-              style={currentScene.id === scene.id ? { background: 'linear-gradient(135deg,#F3A8A8,#E8C1F4)' } : {}}
+              className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-2xl font-fredoka text-[11px] font-semibold shrink-0 transition-all"
+              style={currentScene.id === scene.id
+                ? { background: 'rgba(255,217,61,0.3)', border: '1.5px solid #FFD93D', color: '#FFD93D' }
+                : { background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.75)' }
+              }
             >
               <span className="text-base">{scene.emoji}</span>
               <span className="whitespace-nowrap">{scene.name}</span>
             </motion.button>
           ))}
-          {/* Upload button */}
-          <motion.button
-            whileTap={{ scale: 0.92 }}
-            onClick={() => fileInputRef.current?.click()}
-            className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-2xl font-fredoka text-[11px] font-semibold shrink-0 bg-white/80 border-2 border-dashed border-pink-300 text-pink-400"
-          >
-            <span className="text-base">📁</span>
-            <span className="whitespace-nowrap">上傳圖片</span>
-          </motion.button>
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
         </div>
       </div>
 
       {/* MAIN LAYOUT */}
       <div className="flex-1 flex flex-col md:flex-row gap-2 px-2 pb-3 min-h-0">
 
-        {/* Color / Tool sidebar — horizontal strip on mobile, vertical on desktop */}
-        <div className="bg-white/85 rounded-2xl shadow p-2 shrink-0 md:w-28 overflow-x-auto md:overflow-visible">
+        {/* Color / Tool sidebar */}
+        <div className="rounded-2xl shadow p-2 shrink-0 md:w-28 overflow-x-auto md:overflow-visible"
+          style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}>
           <div className="flex md:flex-col gap-3 md:gap-2 min-w-max md:min-w-0">
             {/* Colors */}
             <div className="shrink-0">
-              <div className="font-fredoka text-[10px] text-muted-foreground text-center mb-1">🎨 顏色</div>
-              <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(10, 22px)' }}
-                   /* desktop: 3 cols */ 
-              >
-                <style>{`@media(min-width:768px){.color-grid{grid-template-columns:repeat(3,22px)!important}}`}</style>
-                <div className="color-grid grid gap-1 col-span-10 md:col-span-1"
-                  style={{ gridTemplateColumns: 'repeat(10, 22px)' }}
-                >
-                  {/* This inner div handles responsive columns via inline + className approach */}
-                </div>
-              </div>
-              {/* Simpler approach: just render colors, CSS handles columns */}
+              <div className="font-fredoka text-[10px] text-white/50 text-center mb-1">🎨 顏色</div>
               <div className="flex flex-wrap gap-1" style={{ maxWidth: 240 }}>
                 {COLORS.map(c => (
                   <button
@@ -246,43 +211,50 @@ export default function ColoringGame() {
                     className="rounded-full transition-all hover:scale-110 shrink-0"
                     style={{
                       background: c, width: 22, height: 22,
-                      border: currentColor === c ? '3px solid #333' : '2px solid rgba(0,0,0,0.1)',
+                      border: currentColor === c ? '3px solid #FFD93D' : '2px solid rgba(255,255,255,0.2)',
                       transform: currentColor === c ? 'scale(1.25)' : '',
-                      outline: c === '#FFFFFF' ? '1px solid #ccc' : 'none',
+                      outline: c === '#FFFFFF' ? '1px solid rgba(255,255,255,0.4)' : 'none',
                     }}
                   />
                 ))}
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="md:hidden w-px bg-gray-200 self-stretch mx-1 shrink-0" />
-            <div className="hidden md:block h-px bg-gray-100 w-full" />
+            <div className="md:hidden w-px self-stretch mx-1 shrink-0" style={{ background: 'rgba(255,255,255,0.15)' }} />
+            <div className="hidden md:block h-px w-full" style={{ background: 'rgba(255,255,255,0.1)' }} />
 
             {/* Brush + tools */}
             <div className="flex md:flex-col gap-2 items-start shrink-0">
               <div>
-                <div className="font-fredoka text-[10px] text-muted-foreground text-center mb-1">🖌️ 筆</div>
+                <div className="font-fredoka text-[10px] text-white/50 text-center mb-1">🖌️ 筆</div>
                 <div className="flex md:flex-col gap-1 items-center">
                   {BRUSH_SIZES.map(s => (
                     <button key={s}
                       onClick={() => setBrushSize(s)}
-                      className={`flex items-center justify-center rounded-full border-2 transition-all shrink-0 ${brushSize === s ? 'border-pink-400 bg-pink-50' : 'border-transparent bg-gray-100'}`}
-                      style={{ width: 26 + s, height: 26 + s }}
+                      className="flex items-center justify-center rounded-full border-2 transition-all shrink-0"
+                      style={{
+                        width: 26 + s, height: 26 + s,
+                        borderColor: brushSize === s ? '#FFD93D' : 'rgba(255,255,255,0.15)',
+                        background: brushSize === s ? 'rgba(255,217,61,0.15)' : 'rgba(255,255,255,0.08)',
+                      }}
                     >
-                      <div className="rounded-full bg-gray-700" style={{ width: s * 0.5 + 2, height: s * 0.5 + 2 }} />
+                      <div className="rounded-full bg-white" style={{ width: s * 0.5 + 2, height: s * 0.5 + 2, opacity: 0.8 }} />
                     </button>
                   ))}
                 </div>
               </div>
               <div className="flex md:flex-col gap-1 shrink-0">
                 {[{ id: 'brush', label: '✏️' }, { id: 'eraser', label: '🧹' }].map(t => (
-                  <button key={t.id} onClick={() => setTool(t.id)} title={t.id === 'brush' ? '畫筆' : '橡皮擦'}
-                    className={`text-lg p-1.5 rounded-xl border-2 transition-all ${tool === t.id ? 'border-pink-400 bg-pink-50' : 'border-transparent bg-gray-100'}`}
+                  <button key={t.id} onClick={() => setTool(t.id)}
+                    className="text-lg p-1.5 rounded-xl border-2 transition-all"
+                    style={{
+                      borderColor: tool === t.id ? '#FFD93D' : 'rgba(255,255,255,0.1)',
+                      background: tool === t.id ? 'rgba(255,217,61,0.15)' : 'rgba(255,255,255,0.07)',
+                    }}
                   >{t.label}</button>
                 ))}
-                <button onClick={undo} className="text-lg p-1.5 rounded-xl bg-gray-100 hover:bg-gray-200">↩️</button>
-                <button onClick={clearAll} className="text-lg p-1.5 rounded-xl bg-red-50 hover:bg-red-100">🗑️</button>
+                <button onClick={undo} className="text-lg p-1.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.1)' }}>↩️</button>
+                <button onClick={clearAll} className="text-lg p-1.5 rounded-xl" style={{ background: 'rgba(220,60,60,0.2)' }}>🗑️</button>
               </div>
             </div>
           </div>
@@ -291,9 +263,10 @@ export default function ColoringGame() {
         {/* Canvas + Stickers */}
         <div className="flex-1 flex flex-col gap-2 min-w-0 min-h-0">
           {/* Canvas */}
-          <div className="flex-1 bg-white/85 rounded-2xl shadow p-1.5 flex items-center justify-center min-h-0">
+          <div className="flex-1 rounded-2xl shadow p-1.5 flex items-center justify-center min-h-0"
+            style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)' }}>
             <div className="relative w-full" style={{ maxWidth: 560 }}>
-              <div className="relative rounded-xl overflow-hidden" style={{ border: '3px dashed #F3A8A8', aspectRatio: '1 / 1' }}>
+              <div className="relative rounded-xl overflow-hidden" style={{ border: '2px solid rgba(255,217,61,0.4)', aspectRatio: '1 / 1' }}>
                 <canvas ref={baseRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 1 }} />
                 <canvas ref={drawRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 2 }} />
                 <canvas ref={imgRef}  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 3, pointerEvents: 'none' }} />
@@ -306,16 +279,26 @@ export default function ColoringGame() {
             </div>
           </div>
 
-          {/* Stickers — 6 columns, 6 rows = 36 total, always even */}
-          <div className="bg-white/85 rounded-2xl shadow px-3 py-2 shrink-0">
-            <div className="font-fredoka text-[10px] text-muted-foreground mb-1.5 text-center">🎀 印章貼紙</div>
-            <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
+          {/* Stickers — auto-fit columns based on container */}
+          <div className="rounded-2xl shadow px-3 py-2 shrink-0"
+            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}>
+            <div className="font-fredoka text-[10px] text-white/50 mb-1.5 text-center">🎀 印章貼紙</div>
+            <div className="flex flex-wrap gap-0.5 justify-start">
               {STICKERS.map(s => (
                 <button
                   key={s}
                   onClick={() => { setCurrentSticker(s); setTool('sticker'); }}
-                  className={`text-xl aspect-square rounded-xl border-2 transition-all hover:scale-125 flex items-center justify-center
-                    ${tool === 'sticker' && currentSticker === s ? 'border-yellow-400 bg-yellow-50 scale-110' : 'border-transparent bg-gray-50'}`}
+                  className="flex items-center justify-center rounded-lg transition-all hover:scale-125"
+                  style={{
+                    width: 32, height: 32, fontSize: 20,
+                    background: tool === 'sticker' && currentSticker === s
+                      ? 'rgba(255,217,61,0.3)'
+                      : 'rgba(255,255,255,0.05)',
+                    border: tool === 'sticker' && currentSticker === s
+                      ? '1.5px solid #FFD93D'
+                      : '1px solid transparent',
+                    transform: tool === 'sticker' && currentSticker === s ? 'scale(1.15)' : '',
+                  }}
                 >
                   {s}
                 </button>

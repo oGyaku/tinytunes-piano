@@ -4,6 +4,11 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+const STARS = Array.from({ length: 20 }, (_, i) => ({
+  x: (i * 43 + 11) % 100, y: (i * 53 + 7) % 100,
+  r: i % 3 === 0 ? 2.5 : 1.5, delay: (i * 0.19) % 2.5,
+}));
+
 const BUILTIN = [
   { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/0fc37d2e1_puzzle1.jpg', label: '彩虹雲朵', emoji: '🌈' },
   { src: 'https://media.base44.com/images/public/69f06f0c3b22568cfa2d4c92/4a025a342_puzzle2.JPG', label: '台灣美食', emoji: '🧋' },
@@ -118,9 +123,26 @@ export default function PuzzleGame() {
   const allImages = uploadedImg ? [uploadedImg, ...BUILTIN] : BUILTIN;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #0d3d6e 0%, #0e5a94 25%, #1278b8 55%, #28a8d8 80%, #4dd4e8 100%)' }}>
+    <div className="min-h-screen flex flex-col relative overflow-hidden"
+      style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
+      {/* Stars */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {STARS.map((s, i) => (
+          <motion.div key={i} className="absolute rounded-full bg-white"
+            style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.r, height: s.r }}
+            animate={{ opacity: [0.1, 0.75, 0.1] }}
+            transition={{ duration: 2.2 + s.delay, repeat: Infinity, delay: s.delay }}
+          />
+        ))}
+        {[{x:'10%',y:'12%'},{x:'85%',y:'8%'},{x:'5%',y:'65%'},{x:'90%',y:'72%'},{x:'50%',y:'92%'}].map((sp,i)=>(
+          <motion.span key={i} className="absolute select-none"
+            style={{ left:sp.x, top:sp.y, fontSize:14, color:'#FFD93D', opacity:0.5 }}
+            animate={{ scale:[1,1.4,1], opacity:[0.3,0.9,0.3] }}
+            transition={{ duration:1.8, delay:i*0.4, repeat:Infinity }}>✦</motion.span>
+        ))}
+      </div>
       {/* Header */}
-      <div className="flex items-center justify-between p-4">
+      <div className="relative z-10 flex items-center justify-between p-4">
         <Link to="/">
           <button className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)' }}>
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -132,7 +154,7 @@ export default function PuzzleGame() {
 
       {/* HOME */}
       {phase === 'home' && (
-        <div className="flex-1 px-4 pb-8 flex flex-col gap-6 max-w-2xl mx-auto w-full">
+        <div className="relative z-10 flex-1 px-4 pb-8 flex flex-col gap-6 max-w-2xl mx-auto w-full">
 
           {/* Upload section */}
           <div className="rounded-3xl p-4 shadow-md" style={{ background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)' }}>
@@ -213,7 +235,7 @@ export default function PuzzleGame() {
 
       {/* PLAYING */}
       {phase === 'playing' && selected && (
-        <div className="flex-1 flex flex-col items-center gap-3 px-4 pb-6">
+        <div className="relative z-10 flex-1 flex flex-col items-center gap-3 px-4 pb-6">
           <div className="flex gap-3 items-center w-full max-w-lg">
             <button onClick={() => setPhase('home')} className="font-fredoka text-sm bg-white/80 rounded-2xl px-3 py-1.5 shadow hover:bg-white transition-all">
               ← 回選擇

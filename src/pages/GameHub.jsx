@@ -103,25 +103,28 @@ export default function GameHub() {
           transition={{ type: 'spring', stiffness: 80 }}
           className="w-full text-left"
         >
-          {/* Big floating creature */}
-          <motion.div
-            animate={{ y: [0, -14, 0] }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="text-8xl mb-4 inline-block"
-          >
-            🐋
-          </motion.div>
+          {/* Big floating creature + title side by side */}
+          <div className="flex items-center gap-4 mb-2">
+            <motion.div
+              animate={{ y: [0, -12, 0] }}
+              transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="text-7xl shrink-0"
+            >
+              🐋
+            </motion.div>
+            <div>
+              <h1 className="font-fredoka font-bold leading-tight"
+                style={{ fontSize: 32, color: '#ffffff', lineHeight: 1.15 }}>
+                兒童學習遊戲
+              </h1>
+              <p className="font-fredoka mt-1" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>
+                玩中學，學中樂 🌟
+              </p>
+            </div>
+          </div>
 
-          <h1 className="font-fredoka font-bold leading-tight"
-            style={{ fontSize: 42, color: '#ffffff', lineHeight: 1.1 }}>
-            海洋<br />天空
-          </h1>
-          <p className="font-fredoka mt-2" style={{ color: 'rgba(255,255,255,0.55)', fontSize: 15 }}>
-            海洋生物的雲上樂園
-          </p>
-
-          {/* Yellow accent line (reference style) */}
-          <div className="mt-3 rounded-full" style={{ width: 48, height: 4, background: '#FFD93D' }} />
+          {/* Yellow accent line */}
+          <div className="mt-2 rounded-full" style={{ width: 48, height: 4, background: '#FFD93D' }} />
         </motion.div>
 
         {/* ── Game cards ── */}
