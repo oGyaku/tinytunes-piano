@@ -10,20 +10,22 @@ export default function FreePlay() {
   const [instrument, setInstrument] = useState('piano');
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col">
+    <div className="min-h-screen relative overflow-hidden flex flex-col"
+      style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
       <BackgroundBubbles />
 
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between p-4 md:p-6">
-        <Link to="/">
-          <button className="w-10 h-10 rounded-full flex items-center justify-center bg-white/60 backdrop-blur-sm shadow-md">
-            <ArrowLeft className="w-5 h-5" />
+        <Link to="/piano">
+          <button className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center"
+            style={{ background:'rgba(255,255,255,0.12)', border:'1.5px solid rgba(255,255,255,0.2)' }}>
+            <ArrowLeft className="w-5 h-5 text-white" />
           </button>
         </Link>
         <motion.h1
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="font-fredoka text-xl md:text-2xl font-bold text-foreground"
+          className="font-fredoka text-xl md:text-2xl lg:text-3xl font-bold text-white drop-shadow"
         >
           🎹 自由彈奏
         </motion.h1>
@@ -41,11 +43,11 @@ export default function FreePlay() {
           <motion.div
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="text-5xl md:text-6xl mb-1"
+            className="text-4xl md:text-5xl lg:text-6xl mb-1"
           >
             🐻
           </motion.div>
-          <p className="font-fredoka text-muted-foreground text-sm">
+          <p className="font-fredoka text-white/60 text-sm md:text-base">
             點按琴鍵，盡情演奏吧！
           </p>
         </motion.div>

@@ -8,11 +8,7 @@ import ScoreDisplay from '@/components/piano/ScoreDisplay';
 import CompletionModal from '@/components/piano/CompletionModal';
 import InstrumentSelector from '@/components/piano/InstrumentSelector';
 import { SONGS, playNote } from '@/lib/audioEngine';
-
-const STARS = Array.from({ length: 16 }, (_, i) => ({
-  x: (i * 47 + 5) % 100, y: (i * 61 + 11) % 100,
-  r: i % 3 === 0 ? 2.5 : 1.5, delay: (i * 0.22) % 2.5,
-}));
+import BackgroundBubbles from '@/components/piano/BackgroundBubbles';
 
 export default function SongMode() {
   const [selectedSong, setSelectedSong] = useState(null);
@@ -92,42 +88,24 @@ export default function SongMode() {
   const currentNoteLetter = currentNote ? currentNote.replace(/\d/, '') : null;
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col"
-      style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
-
-      {/* Stars */}
-      <div className="fixed inset-0 pointer-events-none">
-        {STARS.map((s, i) => (
-          <motion.div key={i} className="absolute rounded-full bg-white"
-            style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.r, height: s.r }}
-            animate={{ opacity: [0.1, 0.7, 0.1] }}
-            transition={{ duration: 2 + s.delay, repeat: Infinity, delay: s.delay }}
-          />
-        ))}
-        {[{x:'8%',y:'15%'},{x:'88%',y:'10%'},{x:'92%',y:'75%'}].map((sp,i)=>(
-          <motion.span key={i} className="absolute select-none"
-            style={{ left:sp.x, top:sp.y, fontSize:13, color:'#FFD93D', opacity:0.5 }}
-            animate={{ scale:[1,1.3,1], opacity:[0.3,0.8,0.3] }}
-            transition={{ duration:2, delay:i*0.5, repeat:Infinity }}>✦</motion.span>
-        ))}
-      </div>
+    <div className="min-h-screen relative overflow-hidden flex flex-col">
+      <BackgroundBubbles />
 
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between p-4 md:p-6">
-        <Link to="/">
-          <button className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.12)', border: '1.5px solid rgba(255,255,255,0.2)' }}>
-            <ArrowLeft className="w-5 h-5 text-white" />
+        <Link to="/piano">
+          <button className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/60 backdrop-blur-sm shadow-md">
+            <ArrowLeft className="w-5 h-5" />
           </button>
         </Link>
         <motion.h1
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="font-fredoka text-xl md:text-2xl font-bold text-white drop-shadow"
+          className="font-fredoka text-xl md:text-2xl lg:text-3xl font-bold text-foreground"
         >
           🎵 歌曲跟彈
         </motion.h1>
-        <div className="w-10" />
+        <div className="w-10 md:w-12" />
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col gap-3 pb-4">
@@ -157,11 +135,11 @@ export default function SongMode() {
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="text-6xl md:text-7xl mb-3"
+                className="text-5xl md:text-6xl lg:text-7xl mb-3"
               >
                 🎶
               </motion.div>
-              <p className="font-fredoka text-lg text-white/60">選擇一首歌曲開始吧！</p>
+              <p className="font-fredoka text-base md:text-lg text-muted-foreground">選擇一首歌曲開始吧！</p>
             </motion.div>
           ) : (
             <>

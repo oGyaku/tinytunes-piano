@@ -33,31 +33,31 @@ export default function Home() {
         </Link>
       </div>
 
-      <div className="relative z-10 flex flex-col items-center w-full max-w-lg">
+      <div className="relative z-10 flex flex-col items-center w-full max-w-sm md:max-w-lg lg:max-w-2xl px-4">
         {/* Logo / Title */}
         <motion.div
           initial={{ y: -40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 100 }}
-          className="text-center mb-10"
+          className="text-center mb-8 md:mb-10"
         >
           <motion.div
             animate={{ rotate: [0, -5, 5, -5, 0] }}
             transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-            className="text-7xl md:text-8xl mb-4"
+            className="text-6xl md:text-7xl lg:text-8xl mb-3"
           >
             🎹
           </motion.div>
-          <h1 className="font-fredoka text-4xl md:text-5xl font-bold text-white drop-shadow-lg">
+          <h1 className="font-fredoka text-3xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">
             演奏
           </h1>
-          <p className="font-fredoka text-white/75 mt-2 text-lg">
+          <p className="font-fredoka text-white/75 mt-2 text-base md:text-lg">
             音樂與歌曲 🎶
           </p>
         </motion.div>
 
         {/* Mode Selection */}
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-3 md:gap-4 w-full">
           {modes.map((mode, i) => (
             <motion.div
               key={mode.to}
@@ -100,7 +100,7 @@ export default function Home() {
 
         {/* Decorative characters */}
         <motion.div
-          className="flex gap-3 mt-10 text-3xl"
+          className="flex gap-3 mt-8 md:mt-10 text-2xl md:text-3xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
