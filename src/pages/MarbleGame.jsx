@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import GameMenu from '@/components/GameMenu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -170,7 +171,7 @@ export default function MarbleGame() {
           <ArrowLeft className="w-4 h-4 text-white" />
         </button></Link>
         <h1 className="font-fredoka text-xl font-bold text-white drop-shadow">🕹️ 彈珠台</h1>
-        <div className="w-9" />
+        <GameMenu currentPath="/marble" />
       </div>
 
       {/* ── HOME ── */}

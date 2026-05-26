@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import GameMenu from '@/components/GameMenu';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -295,7 +296,7 @@ export default function ColoringGame() {
           </button>
         </Link>
         <h1 className="font-fredoka text-lg md:text-2xl lg:text-3xl font-bold text-white drop-shadow">🎨 畫畫</h1>
-        <div className="w-9 md:w-11" />
+        <GameMenu currentPath="/coloring" />
       </div>
 
       {/* Scene strip — horizontal scroll */}

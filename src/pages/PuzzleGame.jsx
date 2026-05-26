@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import GameMenu from '@/components/GameMenu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -149,7 +150,7 @@ export default function PuzzleGame() {
           </button>
         </Link>
         <h1 className="font-fredoka text-xl font-bold text-white drop-shadow">🧩 拼圖</h1>
-        <div className="w-10" />
+        <GameMenu currentPath="/puzzle" />
       </div>
 
       {/* HOME */}

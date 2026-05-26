@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import GameMenu from '@/components/GameMenu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -203,7 +204,7 @@ export default function SpotItGame() {
           </button>
         </Link>
         <h1 className="font-fredoka text-xl font-bold text-white drop-shadow">🔍 尋找</h1>
-        <div className="w-10" />
+        <GameMenu currentPath="/spotit" />
       </div>
 
       {/* HOME */}

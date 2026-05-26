@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import GameMenu from '@/components/GameMenu';
 import { Link } from 'react-router-dom';
 import BackgroundBubbles from '@/components/piano/BackgroundBubbles';
 
@@ -31,6 +32,9 @@ export default function Home() {
             ← 遊樂園
           </motion.button>
         </Link>
+      </div>
+      <div className="absolute top-4 right-4 z-20">
+        <GameMenu currentPath="/piano" />
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center w-full max-w-sm md:max-w-lg lg:max-w-2xl mx-auto px-4 py-16">
