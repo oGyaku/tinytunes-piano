@@ -109,7 +109,7 @@ export default function GameHub() {
               animate={{ y: [0, -12, 0] }}
               transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
               className="text-7xl shrink-0"
-              >
+            >
               🌌
             </motion.div>
             <div>
@@ -118,7 +118,7 @@ export default function GameHub() {
                 台味小宇宙
               </h1>
               <p className="font-fredoka mt-1" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>
-                玩中學，學中樂 🌟
+                探索台灣的小宇宙 🌌
               </p>
             </div>
           </div>
@@ -213,7 +213,7 @@ export default function GameHub() {
         {/* Bottom creatures */}
         <motion.div className="flex gap-5 text-2xl"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}>
-          {['🐠','🐬','🐙','🦀','🐡'].map((e, i) => (
+          {['🏮','🧋','🐉','🌸','🚂'].map((e, i) => (
             <motion.span key={i}
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 1.8, delay: i * 0.18, repeat: Infinity }}>

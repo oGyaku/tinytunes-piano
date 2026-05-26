@@ -4,11 +4,9 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 const SYMBOLS = [
-  '🧋','🍙','🥚','🍜','🥟','🍡',
-  '🏮','🧧','🎋','⛩️','🎐','🎪',
-  '🐻','🦜','🦋','🐞','🐟','🦎',
-  '🌸','🌺','🍃','🌾','🍄','🏔️',
-  '🛵','🚂','🎡','⛵','🎭','🀄','🪆'
+  '🧋','🍜','🥟','🥮','🍡','🍵','🧆','🥢','🍱','🎂',
+  '🏮','🧧','🐉','🎋','🪭','🎐','🎊','🎎','🏯','🎪',
+  '🐻','🦋','🐦','🌺','🌸','🏔️','🌿','🚂','🌊','🐠','🦀'
 ];
 
 function generateDeck() {
@@ -223,7 +221,7 @@ export default function SpotItGame() {
             style={{ background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.18)', backdropFilter: 'blur(10px)' }}
           >
             <div className="space-y-2 font-fredoka text-sm text-white/80">
-              <div>🃏 兩張牌各有 6 個台灣圖案</div>
+              <div>🏏 兩張牌各有 6 個台灣圖案</div>
               <div>👁️ 找出兩張牌上相同的那一個</div>
               <div>👆 點擊下方牌上的正確圖案</div>
               <div>⚡ 共 {DECK.length - 1} 關，越快越好！</div>
