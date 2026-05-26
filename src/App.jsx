@@ -12,6 +12,7 @@ import SongMode from '@/pages/SongMode';
 import ColoringGame from '@/pages/ColoringGame';
 import PuzzleGame from '@/pages/PuzzleGame';
 import SpotItGame from '@/pages/SpotItGame';
+import MarbleGame from '@/pages/MarbleGame';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -42,6 +43,7 @@ const AuthenticatedApp = () => {
       <Route path="/coloring" element={<ColoringGame />} />
       <Route path="/puzzle" element={<PuzzleGame />} />
       <Route path="/spotit" element={<SpotItGame />} />
+      <Route path="/marble" element={<MarbleGame />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

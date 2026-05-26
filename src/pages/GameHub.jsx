@@ -9,7 +9,7 @@ const GAMES = [
     desc: '彈琴學歌曲',
     accent: '#FFD93D',
     cardBg: '#2D1B69',
-    deco: '🐳',
+    deco: '🪐',
   },
   {
     to: '/coloring',
@@ -18,7 +18,7 @@ const GAMES = [
     desc: '塗上美麗顏色',
     accent: '#FF6B6B',
     cardBg: '#1A3A5C',
-    deco: '🐙',
+    deco: '🌍',
   },
   {
     to: '/puzzle',
@@ -27,7 +27,7 @@ const GAMES = [
     desc: '完成美麗圖案',
     accent: '#4ECDC4',
     cardBg: '#2D1B69',
-    deco: '🐠',
+    deco: '🌙',
   },
   {
     to: '/spotit',
@@ -36,7 +36,16 @@ const GAMES = [
     desc: '找出相同圖案',
     accent: '#FFD93D',
     cardBg: '#1A2A5E',
-    deco: '🪼',
+    deco: '⭐',
+  },
+  {
+    to: '/marble',
+    emoji: '🎱',
+    title: '彈珠',
+    desc: '夜市彈珠台',
+    accent: '#C850C0',
+    cardBg: '#1A0B40',
+    deco: '🚀',
   },
 ];
 
@@ -210,10 +219,10 @@ export default function GameHub() {
           </div>
         </motion.div>
 
-        {/* Bottom creatures */}
+        {/* Bottom planets */}
         <motion.div className="flex gap-5 text-2xl"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}>
-          {['🏮','🧋','🐉','🌸','🚂'].map((e, i) => (
+          {['🪐','🌍','🌙','✨','🚀'].map((e, i) => (
             <motion.span key={i}
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 1.8, delay: i * 0.18, repeat: Infinity }}>

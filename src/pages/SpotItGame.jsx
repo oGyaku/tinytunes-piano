@@ -244,33 +244,21 @@ export default function SpotItGame() {
       {phase === 'playing' && topCard && playerCard && (
         <div className="relative z-10 flex-1 flex flex-col items-center gap-4 px-4 pb-6">
           <div className="flex gap-3 w-full max-w-sm">
-            {[
-              { label: '得分', value: `${score}/${total}`, color: '#FFD93D' },
-              { label: '時間', value: fmt(seconds), color: '#7adfff' },
-            ].map(s => (
-              <div key={s.label} className="flex-1 rounded-2xl px-3 py-2 text-center"
-                style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }}>
-                <div className="font-fredoka text-xs text-white/50">{s.label}</div>
-                <div className="font-fredoka text-lg font-bold" style={{ color: s.color }}>{s.value}</div>
+            <div className="flex-1 rounded-2xl px-3 py-2 text-center"
+              style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }}>
+              <div className="font-fredoka text-xs text-white/50">得分</div>
+              <div className="font-fredoka text-lg font-bold" style={{
+                color: feedback === 'correct' ? '#80ffcc' : feedback === 'wrong' ? '#ff9999' : '#FFD93D'
+              }}>
+                {feedback === 'correct' ? '✅ 答對！' : feedback === 'wrong' ? '❌ 再找！' : `${score}/${total}`}
               </div>
-            ))}
+            </div>
+            <div className="flex-1 rounded-2xl px-3 py-2 text-center"
+              style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }}>
+              <div className="font-fredoka text-xs text-white/50">時間</div>
+              <div className="font-fredoka text-lg font-bold" style={{ color: '#7adfff' }}>{fmt(seconds)}</div>
+            </div>
           </div>
-
-          <AnimatePresence>
-            {feedback && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}
-                className="font-fredoka text-base font-bold px-6 py-2 rounded-2xl"
-                style={{
-                  background: feedback === 'correct' ? 'rgba(50,200,120,0.25)' : 'rgba(220,60,60,0.25)',
-                  border: `1.5px solid ${feedback === 'correct' ? 'rgba(80,220,130,0.5)' : 'rgba(220,60,60,0.5)'}`,
-                  color: feedback === 'correct' ? '#80ffcc' : '#ff9999',
-                }}
-              >
-                {feedback === 'correct' ? '✅ 答對了！' : '❌ 再找找看！'}
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           <div className="flex flex-col items-center gap-1.5">
             <p className="font-fredoka text-xs text-white/50">🃏 參考牌</p>
