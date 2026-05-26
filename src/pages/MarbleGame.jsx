@@ -91,8 +91,7 @@ function Launcher({ onLaunch, disabled, pulling }) {
           boxShadow: disabled ? 'none' : '0 4px 12px rgba(220,50,50,0.5)',
           cursor: disabled ? 'not-allowed' : 'pointer',
         }}>
-        <span style={{ fontSize: 16 }}>🕹️</span>
-        <span>拉桿</span>
+        <span style={{ fontSize: 20 }}>🕹️</span>
       </motion.button>
     </div>
   );
@@ -108,6 +107,7 @@ export default function MarbleGame() {
   const [ballPath, setBallPath] = useState(null);
   const [finalScore, setFinalScore] = useState(null);
   const [finalLit, setFinalLit] = useState(0);
+  const [launchKey, setLaunchKey] = useState(0);
   const litRef = useRef(new Set());
   const ballsRef = useRef(TOTAL_BALLS);
 
@@ -133,6 +133,7 @@ export default function MarbleGame() {
 
       // 2. Launch ball
       const slot = Math.floor(Math.random() * TOTAL_SLOTS);
+      setLaunchKey(k => k + 1);
       setBallPath(generatePath(slot));
       setIsLaunching(true);
 
@@ -253,7 +254,7 @@ export default function MarbleGame() {
               {/* Animating ball */}
               <AnimatePresence>
                 {ballPath && (
-                  <motion.div key="ball" className="absolute z-10"
+                  <motion.div key={`ball-${launchKey}`} className="absolute z-10"
                     style={{ width: 16, height: 16, borderRadius: '50%',
                       background: 'radial-gradient(circle at 35% 30%, #fffde0, #FFD93D)',
                       boxShadow: '0 0 10px #FFD93D, 0 0 4px #fff',
