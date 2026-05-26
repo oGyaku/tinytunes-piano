@@ -21,7 +21,7 @@ const modes = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen relative overflow-y-auto flex flex-col items-center justify-center p-4"
+    <div className="min-h-screen relative flex flex-col"
       style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}
     >
       <BackgroundBubbles />
@@ -33,7 +33,7 @@ export default function Home() {
         </Link>
       </div>
 
-      <div className="relative z-10 flex flex-col items-center w-full max-w-sm md:max-w-lg lg:max-w-2xl px-4">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center w-full max-w-sm md:max-w-lg lg:max-w-2xl mx-auto px-4 py-16">
         {/* Logo / Title */}
         <motion.div
           initial={{ y: -40, opacity: 0 }}

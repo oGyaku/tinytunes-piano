@@ -283,7 +283,7 @@ export default function ColoringGame() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col select-none overflow-y-auto"
+    <div className="min-h-screen flex flex-col select-none"
       style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
 
       {/* Header */}
@@ -300,7 +300,7 @@ export default function ColoringGame() {
 
       {/* Scene strip — horizontal scroll */}
       <div className="px-3 pb-2 shrink-0">
-        <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth:'none' }}>
+        <div className="flex flex-wrap gap-1.5 pb-1">
           {BUILTIN_SCENES.map(scene => (
             <motion.button key={scene.id} whileTap={{ scale: 0.92 }}
               onClick={() => handleSelectScene(scene)}
