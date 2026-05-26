@@ -2,51 +2,11 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const GAMES = [
-  {
-    to: '/piano',
-    emoji: '🎹',
-    title: '演奏',
-    desc: '彈琴學歌曲',
-    accent: '#FFD93D',
-    cardBg: '#2D1B69',
-    deco: '🪐',
-  },
-  {
-    to: '/coloring',
-    emoji: '🎨',
-    title: '畫畫',
-    desc: '塗上美麗顏色',
-    accent: '#FF6B6B',
-    cardBg: '#1A3A5C',
-    deco: '🌍',
-  },
-  {
-    to: '/puzzle',
-    emoji: '🧩',
-    title: '拼圖',
-    desc: '完成美麗圖案',
-    accent: '#4ECDC4',
-    cardBg: '#2D1B69',
-    deco: '🌙',
-  },
-  {
-    to: '/spotit',
-    emoji: '🔍',
-    title: '尋找',
-    desc: '找出相同圖案',
-    accent: '#FFD93D',
-    cardBg: '#1A2A5E',
-    deco: '⭐',
-  },
-  {
-    to: '/marble',
-    emoji: '🎱',
-    title: '彈珠',
-    desc: '夜市彈珠台',
-    accent: '#C850C0',
-    cardBg: '#1A0B40',
-    deco: '🚀',
-  },
+  { to: '/piano',   emoji: '🎹', title: '演奏', desc: '彈琴學歌曲',   accent: '#FFD93D', cardBg: '#2D1B69', deco: '🪐' },
+  { to: '/coloring',emoji: '🎨', title: '畫畫', desc: '塗上美麗顏色', accent: '#FF6B6B', cardBg: '#1A3A5C', deco: '🌍' },
+  { to: '/puzzle',  emoji: '🧩', title: '拼圖', desc: '完成美麗圖案', accent: '#4ECDC4', cardBg: '#2D1B69', deco: '🌙' },
+  { to: '/spotit',  emoji: '🔍', title: '尋找', desc: '找出相同圖案', accent: '#FFD93D', cardBg: '#1A2A5E', deco: '⭐' },
+  { to: '/marble',  emoji: '🌊', title: '彈珠', desc: '夾市彈珠台！',   accent: '#C850C0', cardBg: '#2D1B69', deco: '🔮' },
 ];
 
 // Stars scattered in background
@@ -219,10 +179,10 @@ export default function GameHub() {
           </div>
         </motion.div>
 
-        {/* Bottom planets */}
+        {/* Bottom creatures */}
         <motion.div className="flex gap-5 text-2xl"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}>
-          {['🪐','🌍','🌙','✨','🚀'].map((e, i) => (
+          {['🪐','🌙','🌍','🌎','🔮'].map((e, i) => (
             <motion.span key={i}
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 1.8, delay: i * 0.18, repeat: Infinity }}>
