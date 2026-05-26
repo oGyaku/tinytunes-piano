@@ -283,8 +283,8 @@ export default function ColoringGame() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col select-none"
-      style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
+    <div className="flex flex-col select-none"
+      style={{ position:'fixed', inset:0, overflowY:'auto', WebkitOverflowScrolling:'touch', background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3 pb-2 shrink-0">

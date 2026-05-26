@@ -10,8 +10,8 @@ export default function FreePlay() {
   const [instrument, setInstrument] = useState('piano');
 
   return (
-    <div className="min-h-screen relative flex flex-col"
-      style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
+    <div className="relative flex flex-col"
+      style={{ position:'fixed', inset:0, overflowY:'auto', WebkitOverflowScrolling:'touch', background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
       <BackgroundBubbles />
 
       {/* Header */}

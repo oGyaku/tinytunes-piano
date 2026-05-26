@@ -88,7 +88,8 @@ export default function SongMode() {
   const currentNoteLetter = currentNote ? currentNote.replace(/\d/, '') : null;
 
   return (
-    <div className="min-h-screen relative flex flex-col">
+    <div className="relative flex flex-col"
+      style={{ position:'fixed', inset:0, overflowY:'auto', WebkitOverflowScrolling:'touch' }}>
       <BackgroundBubbles />
 
       {/* Header */}

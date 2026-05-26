@@ -51,8 +51,8 @@ const STARS = Array.from({ length: 28 }, (_, i) => ({
 export default function GameHub() {
   return (
     <div
-      className="min-h-screen relative flex flex-col items-center"
-      style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}
+      className="flex flex-col items-center"
+      style={{ position:'fixed', inset:0, overflowY:'auto', WebkitOverflowScrolling:'touch', background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}
     >
       {/* ── Blob shapes (reference style) ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
