@@ -45,12 +45,12 @@ function generatePath(slot) {
 function Launcher({ onLaunch, disabled, pulling }) {
   return (
     <div className="relative flex flex-col items-center justify-end shrink-0"
-      style={{ width: 48, alignSelf: 'stretch',
+      style={{ width: 64, alignSelf: 'stretch',
         background: 'rgba(0,0,0,0.35)', borderLeft: '2px solid rgba(255,255,255,0.12)' }}>
 
       {/* Channel track */}
       <div className="absolute rounded-full"
-        style={{ width: 8, top: 12, bottom: 110, left: '50%', transform: 'translateX(-50%)',
+        style={{ width: 10, top: 12, bottom: 140, left: '50%', transform: 'translateX(-50%)',
           background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }} />
 
       {/* Ball waiting in launcher */}
@@ -58,7 +58,7 @@ function Launcher({ onLaunch, disabled, pulling }) {
         animate={{ y: pulling ? 12 : 0 }}
         transition={{ duration: 0.15 }}
         className="relative z-10 rounded-full"
-        style={{ width: 20, height: 20, marginBottom: 2,
+        style={{ width: 28, height: 28, marginBottom: 4,
           background: 'radial-gradient(circle at 35% 30%, #fff9, #FFD93D)',
           boxShadow: '0 0 8px #FFD93D99' }}
       />
@@ -68,7 +68,7 @@ function Launcher({ onLaunch, disabled, pulling }) {
         animate={{ scaleY: pulling ? 0.45 : 1 }}
         transition={{ duration: 0.15 }}
         style={{
-          width: 16, height: 32, transformOrigin: 'bottom',
+          width: 22, height: 44, transformOrigin: 'bottom',
           backgroundImage: 'repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(180,200,255,0.7) 3px, rgba(180,200,255,0.7) 5px)',
           borderRadius: 3,
         }}
@@ -76,15 +76,15 @@ function Launcher({ onLaunch, disabled, pulling }) {
 
       {/* Base plate */}
       <div className="rounded-t-lg mt-0.5"
-        style={{ width: 36, height: 10, background: 'rgba(255,255,255,0.15)' }} />
+        style={{ width: 52, height: 12, background: 'rgba(255,255,255,0.15)' }} />
 
       {/* Pull handle */}
       <motion.button
         whileTap={{ scale: 0.9 }}
         onClick={!disabled ? onLaunch : undefined}
-        className="relative z-10 rounded-2xl font-fredoka font-bold mt-2 mb-3 flex flex-col items-center justify-center"
+        className="relative z-10 rounded-2xl mt-2 mb-3 flex items-center justify-center"
         style={{
-          width: 38, height: 44, fontSize: 10, lineHeight: 1.3,
+          width: 52, height: 52, fontSize: 28,
           background: disabled ? 'rgba(255,255,255,0.1)' : 'linear-gradient(180deg,#FF6B6B,#CC2222)',
           color: disabled ? 'rgba(255,255,255,0.3)' : '#fff',
           border: disabled ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,100,100,0.6)',
@@ -205,26 +205,26 @@ export default function MarbleGame() {
       {phase === 'playing' && (
         <div className="flex flex-col items-center gap-3 px-4 pb-4">
           {/* Stats */}
-          <div className="flex gap-3 w-full max-w-sm">
+          <div className="flex gap-3 w-full">
             {[
               { label: '剩餘球數', value: `${ballsLeft}`, color: '#FFD93D' },
               { label: '已亮軌道', value: `${litSlots.size} / ${TOTAL_SLOTS}`, color: '#4ECDC4' },
             ].map(s => (
               <div key={s.label} className="flex-1 rounded-2xl px-3 py-2 text-center"
                 style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }}>
-                <div className="font-fredoka text-xs text-white/50">{s.label}</div>
-                <div className="font-fredoka text-lg font-bold" style={{ color: s.color }}>{s.value}</div>
+                <div className="font-fredoka text-sm text-white/60">{s.label}</div>
+                <div className="font-fredoka text-2xl font-bold" style={{ color: s.color }}>{s.value}</div>
               </div>
             ))}
           </div>
 
           {/* Board + Launcher */}
-          <div className="flex w-full max-w-sm rounded-2xl overflow-hidden"
+          <div className="flex w-full rounded-2xl overflow-hidden"
             style={{ border: '2px solid rgba(255,255,255,0.15)' }}>
 
             {/* Main board */}
             <div className="relative flex-1"
-              style={{ height: 340, background: 'linear-gradient(180deg, #050820 0%, #0a1035 100%)' }}>
+              style={{ height: 480, background: 'linear-gradient(180deg, #050820 0%, #0a1035 100%)' }}>
 
               {/* Pegs */}
               {PEGS.map((p, i) => (
@@ -232,11 +232,11 @@ export default function MarbleGame() {
                   style={{
                     left: `${p.x}%`, top: `${p.y}%`,
                     transform: 'translate(-50%, -50%)',
-                    width: 8, height: 8,
-                    background: 'rgba(160,200,255,0.8)',
+                    width: 12, height: 12,
+                    background: 'rgba(160,200,255,0.85)',
                     borderRadius: '2px',
                     rotate: '45deg',
-                    boxShadow: '0 0 4px rgba(160,200,255,0.6)',
+                    boxShadow: '0 0 6px rgba(160,200,255,0.7)',
                   }}
                 />
               ))}
@@ -255,9 +255,9 @@ export default function MarbleGame() {
               <AnimatePresence>
                 {ballPath && (
                   <motion.div key={`ball-${launchKey}`} className="absolute z-10"
-                    style={{ width: 16, height: 16, borderRadius: '50%',
+                    style={{ width: 22, height: 22, borderRadius: '50%',
                       background: 'radial-gradient(circle at 35% 30%, #fffde0, #FFD93D)',
-                      boxShadow: '0 0 10px #FFD93D, 0 0 4px #fff',
+                      boxShadow: '0 0 14px #FFD93D, 0 0 5px #fff',
                       transform: 'translate(-50%, -50%)',
                     }}
                     initial={{ left: ballPath.x[0], top: ballPath.y[0] }}
@@ -285,7 +285,7 @@ export default function MarbleGame() {
                         boxShadow: lit ? '0 -4px 8px rgba(255,217,61,0.4)' : 'none',
                         transition: 'background 0.25s',
                       }}>
-                      <span className="font-fredoka" style={{ fontSize: 7, color: lit ? '#1a0b40' : 'rgba(255,255,255,0.2)' }}>
+                      <span className="font-fredoka" style={{ fontSize: 10, fontWeight: 'bold', color: lit ? '#1a0b40' : 'rgba(255,255,255,0.25)' }}>
                         {i + 1}
                       </span>
                     </motion.div>
@@ -299,11 +299,11 @@ export default function MarbleGame() {
           </div>
 
           {/* Ball counter dots */}
-          <div className="flex gap-1 flex-wrap justify-center max-w-xs">
+          <div className="flex gap-1.5 flex-wrap justify-center w-full px-2">
             {Array.from({ length: TOTAL_BALLS }, (_, i) => (
               <div key={i} className="rounded-full"
                 style={{
-                  width: 9, height: 9,
+                  width: 14, height: 14,
                   background: i < ballsLeft ? '#FFD93D' : 'rgba(255,255,255,0.12)',
                   boxShadow: i < ballsLeft ? '0 0 4px #FFD93D66' : 'none',
                   transition: 'background 0.2s',
@@ -311,7 +311,7 @@ export default function MarbleGame() {
             ))}
           </div>
 
-          <p className="font-fredoka text-white/35 text-xs">
+          <p className="font-fredoka text-white/60 text-sm font-bold">
             {pulling ? '⚡ 彈射中…' : isLaunching ? '💥 彈珠飛行中…' : ballsLeft <= 0 ? '⌛ 結算中…' : '👉 點擊右側拉桿發射'}
           </p>
         </div>
