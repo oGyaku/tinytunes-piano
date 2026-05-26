@@ -109,13 +109,13 @@ export default function GameHub() {
               animate={{ y: [0, -12, 0] }}
               transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
               className="text-7xl shrink-0"
-            >
-              🐋
+              >
+              🌌
             </motion.div>
             <div>
               <h1 className="font-fredoka font-bold leading-tight"
                 style={{ fontSize: 32, color: '#ffffff', lineHeight: 1.15 }}>
-                兒童學習遊戲
+                台味小宇宙
               </h1>
               <p className="font-fredoka mt-1" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>
                 玩中學，學中樂 🌟
