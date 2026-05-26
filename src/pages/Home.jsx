@@ -21,7 +21,7 @@ const modes = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4"
+    <div className="min-h-screen relative overflow-y-auto flex flex-col items-center justify-center p-4"
       style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}
     >
       <BackgroundBubbles />

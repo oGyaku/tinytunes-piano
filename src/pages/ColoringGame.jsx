@@ -356,17 +356,20 @@ export default function ColoringGame() {
 
         {/* Center: canvas + stickers stacked */}
         <div className="flex-1 flex flex-col gap-3 min-w-0">
-          {/* Canvas wrapper — measure width here */}
-          <div ref={wrapDesktopRef} className="w-full rounded-xl overflow-hidden" style={{ aspectRatio:'1/1', border:'2px solid rgba(255,217,61,0.4)', position:'relative' }}>
-            <canvas ref={baseRefD}  style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:1 }} />
-            <canvas ref={drawRefD}  style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:2 }} />
-            <canvas ref={imgRefD}   style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:3, pointerEvents:'none' }} />
-            <canvas ref={eventRefD}
-              style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:4, cursor: tool==='sticker'?'cell':'crosshair' }}
-              onMouseDown={desktopHandlers.startDraw} onMouseMove={desktopHandlers.onDraw}
-              onMouseUp={desktopHandlers.stopDraw} onMouseLeave={desktopHandlers.stopDraw}
-              onTouchStart={desktopHandlers.startDraw} onTouchMove={desktopHandlers.onDraw} onTouchEnd={desktopHandlers.stopDraw}
-            />
+          {/* Canvas — capped so it never taller than viewport */}
+          <div className="flex justify-center">
+            <div ref={wrapDesktopRef} className="rounded-xl overflow-hidden"
+              style={{ aspectRatio:'1/1', width:'100%', maxWidth:'calc(100vh - 180px)', border:'2px solid rgba(255,217,61,0.4)', position:'relative' }}>
+              <canvas ref={baseRefD}  style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:1 }} />
+              <canvas ref={drawRefD}  style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:2 }} />
+              <canvas ref={imgRefD}   style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:3, pointerEvents:'none' }} />
+              <canvas ref={eventRefD}
+                style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:4, cursor: tool==='sticker'?'cell':'crosshair' }}
+                onMouseDown={desktopHandlers.startDraw} onMouseMove={desktopHandlers.onDraw}
+                onMouseUp={desktopHandlers.stopDraw} onMouseLeave={desktopHandlers.stopDraw}
+                onTouchStart={desktopHandlers.startDraw} onTouchMove={desktopHandlers.onDraw} onTouchEnd={desktopHandlers.stopDraw}
+              />
+            </div>
           </div>
 
           {/* Stickers */}

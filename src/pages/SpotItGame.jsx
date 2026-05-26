@@ -175,7 +175,7 @@ export default function SpotItGame() {
   const cardW = typeof window !== 'undefined' ? Math.min(window.innerWidth - 40, 360) : 320;
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden"
+    <div className="min-h-screen flex flex-col relative overflow-y-auto"
       style={{ background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
 
       {/* Stars */}
