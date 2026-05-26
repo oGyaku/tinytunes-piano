@@ -1,217 +1,198 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-const NUM_SLOTS = 15;
-const NUM_BALLS = 15;
+const TOTAL_BALLS = 15;
+const TOTAL_SLOTS = 15;
 
-const PEG_ROWS = [
-  [1,3,5,7,9,11,13],
-  [0,2,4,6,8,10,12,14],
-  [1,3,5,7,9,11,13],
-  [0,2,4,6,8,10,12,14],
+// Peg positions as % of main board (0-100)
+const PEGS = [
+  // row 1
+  {x:10,y:16},{x:24,y:16},{x:38,y:16},{x:52,y:16},{x:66,y:16},{x:80,y:16},
+  // row 2
+  {x:17,y:27},{x:31,y:27},{x:45,y:27},{x:59,y:27},{x:73,y:27},
+  // row 3
+  {x:10,y:38},{x:24,y:38},{x:38,y:38},{x:52,y:38},{x:66,y:38},{x:80,y:38},
+  // row 4
+  {x:17,y:49},{x:31,y:49},{x:45,y:49},{x:59,y:49},{x:73,y:49},
+  // row 5
+  {x:10,y:60},{x:24,y:60},{x:38,y:60},{x:52,y:60},{x:66,y:60},{x:80,y:60},
+  // row 6
+  {x:17,y:71},{x:31,y:71},{x:45,y:71},{x:59,y:71},{x:73,y:71},
 ];
 
 function calcScore(litCount) {
-  if (litCount < 7 || litCount > 11) {
-    return { pts: Math.floor(Math.random() * 6) + 5, jackpot: true };
-  }
-  if (litCount === 7 || litCount === 11) return { pts: 2, jackpot: false };
-  return { pts: 1, jackpot: false };
+  if (litCount < 7 || litCount > 11) return Math.floor(Math.random() * 6) + 5;
+  if (litCount === 7 || litCount === 11) return 2;
+  return 1;
 }
 
-const STARS = Array.from({ length: 20 }, (_, i) => ({
-  x: (i * 41 + 7) % 100, y: (i * 57 + 13) % 100,
-  r: i % 3 === 0 ? 2.5 : 1.5, delay: (i * 0.22) % 2.5,
-}));
+// Generate a zigzag ball path through the board
+// All values are % of the main board dimensions
+function generatePath(slot) {
+  const endX = (slot + 0.5) * (100 / TOTAL_SLOTS);
+  const clamp = (v) => Math.max(5, Math.min(92, v));
+  const r = () => (Math.random() - 0.5) * 28;
+  return {
+    x: ['88%', '88%', `${clamp(endX + r())}%`, `${clamp(endX + r())}%`, `${clamp(endX + r())}%`, `${endX}%`],
+    y: ['84%',  '4%',            '22%',             '42%',             '64%',           '88%'],
+    times: [0, 0.18, 0.40, 0.60, 0.80, 1],
+  };
+}
 
-const BALL_COLORS = ['#FFD93D','#FF6B6B','#4ECDC4','#C850C0','#7adfff','#80ffcc'];
-
-function Board({ litSlots, dropping, ballPos, onSlotClick }) {
-  const boardW = typeof window !== 'undefined' ? Math.min(window.innerWidth - 32, 420) : 375;
-  const slotW = Math.floor(boardW / NUM_SLOTS);
-  const actualW = slotW * NUM_SLOTS;
-  const boardH = 180;
-  const ballColor = BALL_COLORS[Math.floor(Math.random() * BALL_COLORS.length)];
-
+// ── Launcher component ──────────────────────────────────────────────────
+function Launcher({ onLaunch, disabled, pulling }) {
   return (
-    <div style={{ width: actualW }}>
-      {/* Pegboard */}
-      <div className="relative rounded-2xl overflow-hidden mb-1"
-        style={{ width: actualW, height: boardH, background: 'rgba(255,255,255,0.06)', border: '1.5px solid rgba(255,255,255,0.15)', cursor: dropping ? 'default' : 'pointer' }}
-        onClick={e => {
-          if (dropping) return;
-          const rect = e.currentTarget.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const slot = Math.max(0, Math.min(NUM_SLOTS - 1, Math.floor(x / slotW)));
-          onSlotClick(slot);
+    <div className="relative flex flex-col items-center justify-end shrink-0"
+      style={{ width: 48, alignSelf: 'stretch',
+        background: 'rgba(0,0,0,0.35)', borderLeft: '2px solid rgba(255,255,255,0.12)' }}>
+
+      {/* Channel track */}
+      <div className="absolute rounded-full"
+        style={{ width: 8, top: 12, bottom: 110, left: '50%', transform: 'translateX(-50%)',
+          background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }} />
+
+      {/* Ball waiting in launcher */}
+      <motion.div
+        animate={{ y: pulling ? 12 : 0 }}
+        transition={{ duration: 0.15 }}
+        className="relative z-10 rounded-full"
+        style={{ width: 20, height: 20, marginBottom: 2,
+          background: 'radial-gradient(circle at 35% 30%, #fff9, #FFD93D)',
+          boxShadow: '0 0 8px #FFD93D99' }}
+      />
+
+      {/* Spring coil */}
+      <motion.div
+        animate={{ scaleY: pulling ? 0.45 : 1 }}
+        transition={{ duration: 0.15 }}
+        style={{
+          width: 16, height: 32, transformOrigin: 'bottom',
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(180,200,255,0.7) 3px, rgba(180,200,255,0.7) 5px)',
+          borderRadius: 3,
         }}
-      >
-        {/* Pegs */}
-        {PEG_ROWS.map((row, ri) => row.map(ci => (
-          <div key={`${ri}-${ci}`} className="absolute rounded-full"
-            style={{
-              width: 5, height: 5,
-              left: ci * slotW + slotW / 2 - 2.5,
-              top: 20 + ri * 38,
-              background: 'rgba(255,255,255,0.55)',
-              boxShadow: '0 0 4px rgba(255,255,255,0.3)',
-            }} />
-        )))}
+      />
 
-        {/* Column guides */}
-        {Array.from({ length: NUM_SLOTS }, (_, i) => (
-          <div key={i} className="absolute top-0 bottom-0"
-            style={{ left: i * slotW, width: slotW, borderRight: '1px solid rgba(255,255,255,0.04)' }} />
-        ))}
+      {/* Base plate */}
+      <div className="rounded-t-lg mt-0.5"
+        style={{ width: 36, height: 10, background: 'rgba(255,255,255,0.15)' }} />
 
-        {/* Falling ball */}
-        {dropping && ballPos && (
-          <motion.div
-            initial={{ y: -8, x: ballPos.fromSlot * slotW + slotW / 2 - 9 }}
-            animate={{ y: boardH - 20, x: ballPos.toSlot * slotW + slotW / 2 - 9 }}
-            transition={{ duration: 0.75, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="absolute rounded-full z-10"
-            style={{
-              width: 18, height: 18,
-              background: `radial-gradient(circle at 35% 30%, #fff, ${ballColor})`,
-              boxShadow: `0 0 10px ${ballColor}99`,
-            }}
-          />
-        )}
-
-        {/* Aim label */}
-        {!dropping && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="font-fredoka text-white/20 text-sm">👆 點擊投球</span>
-          </div>
-        )}
-      </div>
-
-      {/* Slot lights */}
-      <div className="flex gap-px">
-        {Array.from({ length: NUM_SLOTS }, (_, i) => (
-          <motion.div
-            key={i}
-            animate={litSlots.has(i) ? { scale: [1, 1.15, 1] } : {}}
-            transition={{ duration: 0.3 }}
-            onClick={() => !dropping && onSlotClick(i)}
-            style={{
-              flex: 1,
-              height: slotW - 2,
-              borderRadius: 4,
-              background: litSlots.has(i)
-                ? 'linear-gradient(180deg, #FFD93D, #FF9F43)'
-                : 'rgba(255,255,255,0.08)',
-              border: `1px solid ${litSlots.has(i) ? 'rgba(255,217,61,0.6)' : 'rgba(255,255,255,0.1)'}`,
-              boxShadow: litSlots.has(i) ? '0 0 8px rgba(255,217,61,0.5)' : 'none',
-              cursor: dropping ? 'default' : 'pointer',
-              transition: 'background 0.2s, box-shadow 0.2s',
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Slot numbers */}
-      <div className="flex gap-px mt-0.5">
-        {Array.from({ length: NUM_SLOTS }, (_, i) => (
-          <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: 7, color: 'rgba(255,255,255,0.25)', fontFamily: 'Fredoka, sans-serif' }}>
-            {i + 1}
-          </div>
-        ))}
-      </div>
+      {/* Pull handle */}
+      <motion.button
+        whileTap={{ scale: 0.9 }}
+        onClick={!disabled ? onLaunch : undefined}
+        className="relative z-10 rounded-2xl font-fredoka font-bold mt-2 mb-3 flex flex-col items-center justify-center"
+        style={{
+          width: 38, height: 44, fontSize: 10, lineHeight: 1.3,
+          background: disabled ? 'rgba(255,255,255,0.1)' : 'linear-gradient(180deg,#FF6B6B,#CC2222)',
+          color: disabled ? 'rgba(255,255,255,0.3)' : '#fff',
+          border: disabled ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,100,100,0.6)',
+          boxShadow: disabled ? 'none' : '0 4px 12px rgba(220,50,50,0.5)',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+        }}>
+        <span style={{ fontSize: 16 }}>🕹️</span>
+        <span>拉桿</span>
+      </motion.button>
     </div>
   );
 }
 
+// ── Main game ──────────────────────────────────────────────────────────
 export default function MarbleGame() {
   const [phase, setPhase] = useState('home');
-  const [ballsLeft, setBallsLeft] = useState(NUM_BALLS);
   const [litSlots, setLitSlots] = useState(new Set());
-  const [dropping, setDropping] = useState(false);
-  const [ballPos, setBallPos] = useState(null);
-  const [scoreResult, setScoreResult] = useState(null);
-
-  useEffect(() => {
-    if (phase === 'playing' && ballsLeft === 0 && !dropping) {
-      const result = calcScore(litSlots.size);
-      setScoreResult(result);
-      setTimeout(() => setPhase('result'), 400);
-    }
-  }, [ballsLeft, dropping, phase, litSlots.size]);
+  const [ballsLeft, setBallsLeft] = useState(TOTAL_BALLS);
+  const [isLaunching, setIsLaunching] = useState(false);
+  const [pulling, setPulling] = useState(false);
+  const [ballPath, setBallPath] = useState(null);
+  const [finalScore, setFinalScore] = useState(null);
+  const [finalLit, setFinalLit] = useState(0);
+  const litRef = useRef(new Set());
+  const ballsRef = useRef(TOTAL_BALLS);
 
   const startGame = () => {
-    setBallsLeft(NUM_BALLS);
+    litRef.current = new Set();
+    ballsRef.current = TOTAL_BALLS;
     setLitSlots(new Set());
-    setDropping(false);
-    setBallPos(null);
-    setScoreResult(null);
+    setBallsLeft(TOTAL_BALLS);
+    setIsLaunching(false);
+    setPulling(false);
+    setBallPath(null);
+    setFinalScore(null);
     setPhase('playing');
   };
 
-  const dropBall = (targetSlot) => {
-    if (dropping || ballsLeft <= 0 || phase !== 'playing') return;
-    const dev = Math.floor(Math.random() * 5) - 2;
-    const landSlot = Math.max(0, Math.min(NUM_SLOTS - 1, targetSlot + dev));
-    setBallPos({ fromSlot: targetSlot, toSlot: landSlot });
-    setDropping(true);
+  const handleLaunch = () => {
+    if (isLaunching || pulling || ballsRef.current <= 0) return;
+
+    // 1. Pull lever
+    setPulling(true);
     setTimeout(() => {
-      setLitSlots(prev => new Set([...prev, landSlot]));
-      setBallsLeft(prev => prev - 1);
-      setBallPos(null);
-      setDropping(false);
-    }, 850);
+      setPulling(false);
+
+      // 2. Launch ball
+      const slot = Math.floor(Math.random() * TOTAL_SLOTS);
+      setBallPath(generatePath(slot));
+      setIsLaunching(true);
+
+      // 3. Ball lands (after animation finishes)
+      setTimeout(() => {
+        litRef.current = new Set([...litRef.current, slot]);
+        setLitSlots(new Set(litRef.current));
+        ballsRef.current -= 1;
+        setBallsLeft(ballsRef.current);
+        setBallPath(null);
+        setIsLaunching(false);
+
+        if (ballsRef.current === 0) {
+          setTimeout(() => {
+            const litCount = litRef.current.size;
+            setFinalLit(litCount);
+            setFinalScore(calcScore(litCount));
+            setPhase('end');
+          }, 400);
+        }
+      }, 1600);
+    }, 320);
   };
 
   return (
-    <div className="flex flex-col"
-      style={{ position: 'fixed', inset: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
-
-      {/* Stars */}
-      <div className="fixed inset-0 pointer-events-none">
-        {STARS.map((s, i) => (
-          <motion.div key={i} className="absolute rounded-full bg-white"
-            style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.r, height: s.r }}
-            animate={{ opacity: [0.15, 0.8, 0.15] }}
-            transition={{ duration: 2.2 + s.delay, repeat: Infinity, delay: s.delay }}
-          />
-        ))}
-      </div>
+    <div className="flex flex-col select-none"
+      style={{ position: 'fixed', inset: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
+        background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between p-4">
-        <Link to="/">
-          <button className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.12)', border: '1.5px solid rgba(255,255,255,0.2)' }}>
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </button>
-        </Link>
-        <h1 className="font-fredoka text-xl font-bold text-white">🌊 彈珠台</h1>
-        <div className="w-10" />
+      <div className="flex items-center justify-between px-4 pt-3 pb-2 shrink-0">
+        <Link to="/"><button className="w-9 h-9 rounded-full flex items-center justify-center"
+          style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)' }}>
+          <ArrowLeft className="w-4 h-4 text-white" />
+        </button></Link>
+        <h1 className="font-fredoka text-xl font-bold text-white drop-shadow">🕹️ 彈珠台</h1>
+        <div className="w-9" />
       </div>
 
-      {/* HOME */}
+      {/* ── HOME ── */}
       {phase === 'home' && (
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-6 px-6 pb-10">
-          <div className="text-center">
-            <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="text-7xl mb-3">🌊</motion.div>
-            <h2 className="font-fredoka text-3xl font-bold text-white mb-2">夜市彈珠台</h2>
-            <p className="font-fredoka text-white/70 text-sm">點擊板面，投下彈珠！</p>
-          </div>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 pb-10 gap-6">
+          <motion.div initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center">
+            <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 2, repeat: Infinity }}
+              className="text-7xl mb-3">🕹️</motion.div>
+            <h2 className="font-fredoka text-3xl font-bold text-white drop-shadow mb-2">夜市彈珠台</h2>
+            <p className="font-fredoka text-white/70">拉動拉桿，讓彈珠衝入軌道！</p>
+          </motion.div>
           <div className="rounded-3xl p-5 w-full max-w-sm"
             style={{ background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.18)' }}>
             <div className="space-y-2 font-fredoka text-sm text-white/80">
-              <div>🔮 每局共 {NUM_BALLS} 顆彈珠</div>
-              <div>💡 {NUM_SLOTS} 個軌道，球入後亮燈</div>
-              <div>🏆 亮燈 7 或 11 個 → 2分</div>
-              <div>⭐ 亮燈 8、9、10 個 → 1分</div>
-              <div>🌟 亮燈 &lt;7 或 &gt;11 個 → 大獎 5~10分！</div>
+              <div>🕹️ 點擊拉桿發射彈珠</div>
+              <div>💥 彈珠撞釘後隨機落入軌道</div>
+              <div>💡 同軌道重複進入不重複計分</div>
+              <div>🎯 剛好亮 7 或 11 軌 → 2 分</div>
+              <div>✨ 亮 8、9、10 軌 → 1 分</div>
+              <div>🎰 少於 7 或超過 11 軌 → 大獎 5~10 分！</div>
             </div>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.95 }}
-            onClick={startGame}
+          <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.95 }} onClick={startGame}
             className="font-fredoka text-xl font-bold px-10 py-4 rounded-3xl shadow-2xl"
             style={{ background: '#FFD93D', color: '#1a0b40' }}>
             🎮 開始！
@@ -219,69 +200,148 @@ export default function MarbleGame() {
         </div>
       )}
 
-      {/* PLAYING */}
+      {/* ── PLAYING ── */}
       {phase === 'playing' && (
-        <div className="relative z-10 flex flex-col items-center gap-3 px-4 pb-6">
+        <div className="flex flex-col items-center gap-3 px-4 pb-4">
           {/* Stats */}
-          <div className="flex gap-3 w-full max-w-md">
-            <div className="flex-1 rounded-2xl px-3 py-2 text-center"
-              style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }}>
-              <div className="font-fredoka text-xs text-white/50">剩餘球數</div>
-              <div className="font-fredoka text-lg font-bold text-yellow-300">🔮 {ballsLeft}</div>
-            </div>
-            <div className="flex-1 rounded-2xl px-3 py-2 text-center"
-              style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }}>
-              <div className="font-fredoka text-xs text-white/50">亮燈數</div>
-              <div className="font-fredoka text-lg font-bold" style={{ color: '#7adfff' }}>💡 {litSlots.size}</div>
-            </div>
+          <div className="flex gap-3 w-full max-w-sm">
+            {[
+              { label: '剩餘球數', value: `${ballsLeft}`, color: '#FFD93D' },
+              { label: '已亮軌道', value: `${litSlots.size} / ${TOTAL_SLOTS}`, color: '#4ECDC4' },
+            ].map(s => (
+              <div key={s.label} className="flex-1 rounded-2xl px-3 py-2 text-center"
+                style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }}>
+                <div className="font-fredoka text-xs text-white/50">{s.label}</div>
+                <div className="font-fredoka text-lg font-bold" style={{ color: s.color }}>{s.value}</div>
+              </div>
+            ))}
           </div>
 
-          <Board litSlots={litSlots} dropping={dropping} ballPos={ballPos} onSlotClick={dropBall} />
+          {/* Board + Launcher */}
+          <div className="flex w-full max-w-sm rounded-2xl overflow-hidden"
+            style={{ border: '2px solid rgba(255,255,255,0.15)' }}>
 
-          <p className="font-fredoka text-white/40 text-xs mt-1">
-            {dropping ? '💥 彈珠飛行中...' : '👆 點擊板面投下彈珠'}
-          </p>
+            {/* Main board */}
+            <div className="relative flex-1"
+              style={{ height: 340, background: 'linear-gradient(180deg, #050820 0%, #0a1035 100%)' }}>
 
-          {/* Ball count visual */}
+              {/* Pegs */}
+              {PEGS.map((p, i) => (
+                <div key={i} className="absolute"
+                  style={{
+                    left: `${p.x}%`, top: `${p.y}%`,
+                    transform: 'translate(-50%, -50%)',
+                    width: 8, height: 8,
+                    background: 'rgba(160,200,255,0.8)',
+                    borderRadius: '2px',
+                    rotate: '45deg',
+                    boxShadow: '0 0 4px rgba(160,200,255,0.6)',
+                  }}
+                />
+              ))}
+
+              {/* Slot partition lines */}
+              {Array.from({ length: TOTAL_SLOTS - 1 }, (_, i) => (
+                <div key={i} className="absolute bottom-0"
+                  style={{
+                    left: `${(i + 1) * (100 / TOTAL_SLOTS)}%`,
+                    width: 1, height: '14%',
+                    background: 'rgba(255,255,255,0.2)',
+                  }} />
+              ))}
+
+              {/* Animating ball */}
+              <AnimatePresence>
+                {ballPath && (
+                  <motion.div key="ball" className="absolute z-10"
+                    style={{ width: 16, height: 16, borderRadius: '50%',
+                      background: 'radial-gradient(circle at 35% 30%, #fffde0, #FFD93D)',
+                      boxShadow: '0 0 10px #FFD93D, 0 0 4px #fff',
+                      transform: 'translate(-50%, -50%)',
+                    }}
+                    initial={{ left: ballPath.x[0], top: ballPath.y[0] }}
+                    animate={{ left: ballPath.x, top: ballPath.y }}
+                    exit={{ opacity: 0, scale: 0.3 }}
+                    transition={{ duration: 1.5, times: ballPath.times, ease: 'easeIn' }}
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* Slot lights row */}
+              <div className="absolute bottom-0 left-0 right-0 flex"
+                style={{ height: '12%' }}>
+                {Array.from({ length: TOTAL_SLOTS }, (_, i) => {
+                  const lit = litSlots.has(i);
+                  return (
+                    <motion.div key={i} className="flex-1 flex items-center justify-center"
+                      animate={lit ? { scale: [1, 1.15, 1] } : {}}
+                      transition={{ duration: 0.25 }}
+                      style={{
+                        background: lit
+                          ? 'linear-gradient(180deg,#FFD93D,#FF9F43)'
+                          : 'rgba(255,255,255,0.05)',
+                        borderTop: `1px solid ${lit ? 'rgba(255,217,61,0.8)' : 'rgba(255,255,255,0.1)'}`,
+                        boxShadow: lit ? '0 -4px 8px rgba(255,217,61,0.4)' : 'none',
+                        transition: 'background 0.25s',
+                      }}>
+                      <span className="font-fredoka" style={{ fontSize: 7, color: lit ? '#1a0b40' : 'rgba(255,255,255,0.2)' }}>
+                        {i + 1}
+                      </span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Launcher column */}
+            <Launcher onLaunch={handleLaunch} disabled={isLaunching || pulling || ballsLeft <= 0} pulling={pulling} />
+          </div>
+
+          {/* Ball counter dots */}
           <div className="flex gap-1 flex-wrap justify-center max-w-xs">
-            {Array.from({ length: NUM_BALLS }, (_, i) => (
-              <div key={i} className="rounded-full transition-all"
+            {Array.from({ length: TOTAL_BALLS }, (_, i) => (
+              <div key={i} className="rounded-full"
                 style={{
-                  width: 10, height: 10,
-                  background: i < ballsLeft ? '#FFD93D' : 'rgba(255,255,255,0.15)',
-                  boxShadow: i < ballsLeft ? '0 0 4px #FFD93D88' : 'none',
+                  width: 9, height: 9,
+                  background: i < ballsLeft ? '#FFD93D' : 'rgba(255,255,255,0.12)',
+                  boxShadow: i < ballsLeft ? '0 0 4px #FFD93D66' : 'none',
+                  transition: 'background 0.2s',
                 }} />
             ))}
           </div>
+
+          <p className="font-fredoka text-white/35 text-xs">
+            {pulling ? '⚡ 彈射中…' : isLaunching ? '💥 彈珠飛行中…' : ballsLeft <= 0 ? '⌛ 結算中…' : '👉 點擊右側拉桿發射'}
+          </p>
         </div>
       )}
 
-      {/* RESULT */}
+      {/* ── END ── */}
       <AnimatePresence>
-        {phase === 'result' && scoreResult && (
+        {phase === 'end' && finalScore !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-sm p-4">
             <motion.div
               initial={{ scale: 0.4, rotate: -10 }} animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 200 }}
               className="rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl"
               style={{ background: 'linear-gradient(135deg, #2d1b6e, #1e3a8a)', border: '2px solid rgba(255,217,61,0.4)' }}>
-              <motion.div animate={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 0.6, repeat: 2 }} className="text-6xl mb-3">
-                {scoreResult.jackpot ? '🌟' : '🏆'}
-              </motion.div>
+              <motion.div animate={{ rotate: [0, -12, 12, 0] }} transition={{ duration: 0.6, repeat: 2 }}
+                className="text-6xl mb-3">{finalScore >= 5 ? '🎰' : finalScore === 2 ? '🎯' : '😊'}</motion.div>
               <h2 className="font-fredoka text-2xl font-bold text-white mb-1">
-                {scoreResult.jackpot ? '大獎！！！' : '遊戲結束！'}
+                {finalScore >= 5 ? '大獎！！！' : finalScore === 2 ? '好球！' : '繼續加油！'}
               </h2>
-              <p className="font-fredoka text-white/70 mb-5">亮燈了 {litSlots.size} 個軌道</p>
+              <p className="font-fredoka text-white/60 mb-5">亮燈了 {finalLit} 個軌道</p>
               <div className="flex gap-3 justify-center mb-6">
-                <div className="rounded-2xl px-5 py-3" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                  <div className="font-fredoka text-xs text-white/50">得分</div>
-                  <div className="font-fredoka text-4xl font-bold" style={{ color: '#FFD93D' }}>{scoreResult.pts}</div>
-                </div>
-                <div className="rounded-2xl px-5 py-3" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                  <div className="font-fredoka text-xs text-white/50">亮燈</div>
-                  <div className="font-fredoka text-4xl font-bold" style={{ color: '#7adfff' }}>{litSlots.size}</div>
-                </div>
+                {[
+                  { label: '亮燈軌道', value: `${finalLit}/${TOTAL_SLOTS}`, color: '#4ECDC4' },
+                  { label: '得分', value: `${finalScore}`, color: '#FFD93D' },
+                ].map(s => (
+                  <div key={s.label} className="rounded-2xl px-4 py-2" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                    <div className="font-fredoka text-xs text-white/50">{s.label}</div>
+                    <div className="font-fredoka text-xl font-bold" style={{ color: s.color }}>{s.value}</div>
+                  </div>
+                ))}
               </div>
               <div className="flex gap-3">
                 <Link to="/" className="flex-1">
@@ -291,9 +351,7 @@ export default function MarbleGame() {
                   </button>
                 </Link>
                 <button onClick={startGame} className="flex-1 font-fredoka py-2.5 rounded-2xl font-bold"
-                  style={{ background: '#FFD93D', color: '#1a0b40' }}>
-                  🔄 再玩
-                </button>
+                  style={{ background: '#FFD93D', color: '#1a0b40' }}>🔄 再玩</button>
               </div>
             </motion.div>
           </motion.div>
