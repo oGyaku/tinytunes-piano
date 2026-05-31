@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Play, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Play, RotateCcw, Square } from 'lucide-react';
 import PianoKeyboard from '@/components/piano/PianoKeyboard';
 import SongCard from '@/components/piano/SongCard';
 import ScoreDisplay from '@/components/piano/ScoreDisplay';
@@ -73,6 +73,12 @@ export default function SongMode() {
       autoPlayRef.current = setTimeout(playNext, selectedSong.tempo);
     };
     playNext();
+  };
+
+  const handleStopAutoPlay = () => {
+    if (autoPlayRef.current) clearTimeout(autoPlayRef.current);
+    setIsAutoPlaying(false);
+    setCurrentNoteIndex(0);
   };
 
   const handleReplay = () => {
@@ -152,15 +158,25 @@ export default function SongMode() {
                   currentIndex={currentNoteIndex}
                 />
                 <div className="flex gap-2">
-                  <button
-                    onClick={handleAutoPlay}
-                    disabled={isAutoPlaying}
-                    className="flex items-center gap-1.5 font-fredoka text-sm px-4 py-2 rounded-full disabled:opacity-50 transition-all"
-                    style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', color: 'white' }}
-                  >
-                    <Play className="w-4 h-4" />
-                    示範
-                  </button>
+                  {isAutoPlaying ? (
+                    <button
+                      onClick={handleStopAutoPlay}
+                      className="flex items-center gap-1.5 font-fredoka text-sm px-4 py-2 rounded-full transition-all"
+                      style={{ background: 'rgba(220,60,60,0.5)', border: '1px solid rgba(255,100,100,0.5)', color: 'white' }}
+                    >
+                      <Square className="w-4 h-4" />
+                      停止
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleAutoPlay}
+                      className="flex items-center gap-1.5 font-fredoka text-sm px-4 py-2 rounded-full transition-all"
+                      style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', color: 'white' }}
+                    >
+                      <Play className="w-4 h-4" />
+                      示範
+                    </button>
+                  )}
                   <button
                     onClick={handleReplay}
                     className="flex items-center gap-1.5 font-fredoka text-sm px-4 py-2 rounded-full transition-all"
