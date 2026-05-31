@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Play, RotateCcw, Square } from 'lucide-react';
+import { ArrowLeft, RotateCcw } from 'lucide-react';
 import PianoKeyboard from '@/components/piano/PianoKeyboard';
 import SongCard from '@/components/piano/SongCard';
 import ScoreDisplay from '@/components/piano/ScoreDisplay';
@@ -17,29 +17,25 @@ export default function SongMode() {
   const [combo, setCombo] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+
   const [instrument, setInstrument] = useState('piano');
-  const autoPlayRef = useRef(null);
+
 
   const currentNote = selectedSong ? selectedSong.notes[currentNoteIndex] : null;
 
-  useEffect(() => {
-    return () => { if (autoPlayRef.current) clearTimeout(autoPlayRef.current); };
-  }, []);
+
 
   const handleSelectSong = (song) => {
-    if (autoPlayRef.current) clearTimeout(autoPlayRef.current);
     setSelectedSong(song);
     setCurrentNoteIndex(0);
     setScore(0);
     setCombo(0);
     setIsPlaying(true);
     setShowComplete(false);
-    setIsAutoPlaying(false);
   };
 
   const handleNotePlay = useCallback((note) => {
-    if (!isPlaying || !selectedSong || isAutoPlaying) return;
+    if (!isPlaying || !selectedSong) return;
     if (note === currentNote) {
       const newCombo = combo + 1;
       const points = 10 + (newCombo > 1 ? newCombo * 2 : 0);
@@ -57,38 +53,14 @@ export default function SongMode() {
     } else {
       setCombo(0);
     }
-  }, [isPlaying, selectedSong, currentNote, currentNoteIndex, combo, score, isAutoPlaying]);
-
-  const handleAutoPlay = () => {
-    if (!selectedSong || isAutoPlaying) return;
-    setIsAutoPlaying(true);
-    setCurrentNoteIndex(0);
-    let i = 0;
-    const playNext = () => {
-      if (i >= selectedSong.notes.length) { setIsAutoPlaying(false); setCurrentNoteIndex(0); return; }
-      const note = selectedSong.notes[i];
-      setCurrentNoteIndex(i);
-      playNote(note, instrument);
-      i++;
-      autoPlayRef.current = setTimeout(playNext, selectedSong.tempo);
-    };
-    playNext();
-  };
-
-  const handleStopAutoPlay = () => {
-    if (autoPlayRef.current) clearTimeout(autoPlayRef.current);
-    setIsAutoPlaying(false);
-    setCurrentNoteIndex(0);
-  };
+  }, [isPlaying, selectedSong, currentNote, currentNoteIndex, combo, score]);
 
   const handleReplay = () => {
-    if (autoPlayRef.current) clearTimeout(autoPlayRef.current);
     setCurrentNoteIndex(0);
     setScore(0);
     setCombo(0);
     setIsPlaying(true);
     setShowComplete(false);
-    setIsAutoPlaying(false);
   };
 
   const currentNoteLetter = currentNote ? currentNote.replace(/\d/, '') : null;
@@ -157,39 +129,11 @@ export default function SongMode() {
                   totalNotes={selectedSong.notes.length}
                   currentIndex={currentNoteIndex}
                 />
-                <div className="flex gap-2">
-                  {isAutoPlaying ? (
-                    <button
-                      onClick={handleStopAutoPlay}
-                      className="flex items-center gap-1.5 font-fredoka text-sm font-semibold px-4 py-2 rounded-full transition-all"
-                      style={{ background: '#E53935', border: '1px solid #C62828', color: '#fff' }}
-                    >
-                      <Square className="w-4 h-4" />
-                      停止
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleAutoPlay}
-                      className="flex items-center gap-1.5 font-fredoka text-sm font-semibold px-4 py-2 rounded-full transition-all"
-                      style={{ background: '#1E88E5', border: '1px solid #1565C0', color: '#fff' }}
-                    >
-                      <Play className="w-4 h-4" />
-                      示範
-                    </button>
-                  )}
-                  <button
-                    onClick={handleReplay}
-                    className="flex items-center gap-1.5 font-fredoka text-sm font-semibold px-4 py-2 rounded-full transition-all"
-                    style={{ background: '#546E7A', border: '1px solid #37474F', color: '#fff' }}
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    重來
-                  </button>
-                </div>
+
               </div>
 
               <AnimatePresence mode="wait">
-                {isPlaying && !isAutoPlaying && currentNote && (
+                {isPlaying && currentNote && (
                   <motion.div
                     key={currentNoteIndex}
                     initial={{ scale: 0.5, opacity: 0 }}
@@ -213,7 +157,7 @@ export default function SongMode() {
             className="w-full px-2"
           >
             <PianoKeyboard
-              highlightedNote={isPlaying || isAutoPlaying ? currentNote : null}
+              highlightedNote={isPlaying ? currentNote : null}
               onPlay={handleNotePlay}
               instrument={instrument}
             />
