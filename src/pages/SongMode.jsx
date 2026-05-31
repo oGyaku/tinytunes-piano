@@ -161,8 +161,8 @@ export default function SongMode() {
                   {isAutoPlaying ? (
                     <button
                       onClick={handleStopAutoPlay}
-                      className="flex items-center gap-1.5 font-fredoka text-sm px-4 py-2 rounded-full transition-all"
-                      style={{ background: 'rgba(220,60,60,0.5)', border: '1px solid rgba(255,100,100,0.5)', color: 'white' }}
+                      className="flex items-center gap-1.5 font-fredoka text-sm font-semibold px-4 py-2 rounded-full transition-all"
+                      style={{ background: '#E53935', border: '1px solid #C62828', color: '#fff' }}
                     >
                       <Square className="w-4 h-4" />
                       停止
@@ -170,8 +170,8 @@ export default function SongMode() {
                   ) : (
                     <button
                       onClick={handleAutoPlay}
-                      className="flex items-center gap-1.5 font-fredoka text-sm px-4 py-2 rounded-full transition-all"
-                      style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', color: 'white' }}
+                      className="flex items-center gap-1.5 font-fredoka text-sm font-semibold px-4 py-2 rounded-full transition-all"
+                      style={{ background: '#1E88E5', border: '1px solid #1565C0', color: '#fff' }}
                     >
                       <Play className="w-4 h-4" />
                       示範
@@ -179,8 +179,8 @@ export default function SongMode() {
                   )}
                   <button
                     onClick={handleReplay}
-                    className="flex items-center gap-1.5 font-fredoka text-sm px-4 py-2 rounded-full transition-all"
-                    style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', color: 'white' }}
+                    className="flex items-center gap-1.5 font-fredoka text-sm font-semibold px-4 py-2 rounded-full transition-all"
+                    style={{ background: '#546E7A', border: '1px solid #37474F', color: '#fff' }}
                   >
                     <RotateCcw className="w-4 h-4" />
                     重來
