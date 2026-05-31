@@ -153,6 +153,8 @@ export default function ColoringGame() {
   const isDrawing = useRef(false);
   const lastPos   = useRef({ x: 0, y: 0 });
   const history   = useRef([]);
+  const containerRef  = useRef(null);
+  const twoFingerRef  = useRef(null); // { midY, scrollTop }
   const currentSceneRef = useRef(BUILTIN_SCENES[0]);
 
   const loadSceneOnCanvas = useCallback((scene, baseRef, drawRef, imgRef) => {
@@ -228,6 +230,15 @@ export default function ColoringGame() {
       history.current.push(d.getContext('2d').getImageData(0, 0, d.width, d.height));
     };
     const startDraw = (e) => {
+      // 雙指 → 記錄起始位置供捲動用
+      if (e.touches && e.touches.length >= 2) {
+        isDrawing.current = false;
+        twoFingerRef.current = {
+          midY: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+          scrollTop: containerRef.current?.scrollTop ?? 0,
+        };
+        return;
+      }
       e.preventDefault();
       const { x, y } = getPos(e, eRef, dRef);
       const dCtx = dRef.current.getContext('2d');
@@ -247,6 +258,15 @@ export default function ColoringGame() {
       dCtx.fillStyle = currentColor; dCtx.fill();
     };
     const onDraw = (e) => {
+      // 雙指 → 手動捲動頁面
+      if (e.touches && e.touches.length >= 2) {
+        if (twoFingerRef.current && containerRef.current) {
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          const delta = twoFingerRef.current.midY - midY;
+          containerRef.current.scrollTop = twoFingerRef.current.scrollTop + delta;
+        }
+        return;
+      }
       e.preventDefault();
       if (!isDrawing.current) return;
       const { x, y } = getPos(e, eRef, dRef);
@@ -260,7 +280,7 @@ export default function ColoringGame() {
       dCtx.lineCap = 'round'; dCtx.lineJoin = 'round'; dCtx.stroke();
       lastPos.current = { x, y };
     };
-    const stopDraw = () => { isDrawing.current = false; };
+    const stopDraw = () => { isDrawing.current = false; twoFingerRef.current = null; };
     return { startDraw, onDraw, stopDraw };
   };
 
@@ -284,7 +304,7 @@ export default function ColoringGame() {
   };
 
   return (
-    <div className="flex flex-col select-none"
+    <div ref={containerRef} className="flex flex-col select-none"
       style={{ position:'fixed', inset:0, overflowY:'auto', WebkitOverflowScrolling:'touch', background: 'linear-gradient(160deg, #1a0b40 0%, #2d1b6e 35%, #1e3a8a 70%, #0f2b5c 100%)' }}>
 
       {/* Header */}
@@ -365,7 +385,7 @@ export default function ColoringGame() {
               <canvas ref={drawRefD}  style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:2 }} />
               <canvas ref={imgRefD}   style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:3, pointerEvents:'none' }} />
               <canvas ref={eventRefD}
-                style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:4, cursor: tool==='sticker'?'cell':'crosshair' }}
+                style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:4, cursor: tool==='sticker'?'cell':'crosshair', touchAction:'none' }}
                 onMouseDown={desktopHandlers.startDraw} onMouseMove={desktopHandlers.onDraw}
                 onMouseUp={desktopHandlers.stopDraw} onMouseLeave={desktopHandlers.stopDraw}
                 onTouchStart={desktopHandlers.startDraw} onTouchMove={desktopHandlers.onDraw} onTouchEnd={desktopHandlers.stopDraw}
@@ -400,7 +420,7 @@ export default function ColoringGame() {
           <canvas ref={drawRefM}  style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:2 }} />
           <canvas ref={imgRefM}   style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:3, pointerEvents:'none' }} />
           <canvas ref={eventRefM}
-            style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:4, cursor: tool==='sticker'?'cell':'crosshair' }}
+            style={{ position:'absolute', inset:0, width:'100%', height:'100%', zIndex:4, cursor: tool==='sticker'?'cell':'crosshair', touchAction:'none' }}
             onMouseDown={mobileHandlers.startDraw} onMouseMove={mobileHandlers.onDraw}
             onMouseUp={mobileHandlers.stopDraw} onMouseLeave={mobileHandlers.stopDraw}
             onTouchStart={mobileHandlers.startDraw} onTouchMove={mobileHandlers.onDraw} onTouchEnd={mobileHandlers.stopDraw}
